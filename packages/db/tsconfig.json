@@ -1,0 +1,4 @@
+{
+  "extends": "@takhti/config/tsconfig.base.json",
+  "include": ["src"]
+}

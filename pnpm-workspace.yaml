@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Exact versions only. Upgrades are deliberate, one package at a time.
+savePrefix: ''
+
+# Packages allowed to run install scripts (native binaries).
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - '@swc/core'
+  - unrs-resolver

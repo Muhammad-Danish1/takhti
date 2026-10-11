@@ -1,0 +1,21 @@
+{
+  "name": "@takhti/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Layer 1. Zod schemas and types shared by server and clients. Depends on zod only.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@takhti/config": "workspace:*",
+    "@types/node": "22.20.5",
+    "typescript": "7.0.2"
+  }
+}

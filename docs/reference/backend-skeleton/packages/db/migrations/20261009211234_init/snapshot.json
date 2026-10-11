@@ -1,0 +1,837 @@
+{
+  "version": "8",
+  "dialect": "postgres",
+  "id": "7e9e163f-0894-4892-a5b8-57b89b50f102",
+  "prevIds": [
+    "00000000-0000-0000-0000-000000000000"
+  ],
+  "ddl": [
+    {
+      "isRlsEnabled": true,
+      "name": "audit_log",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "branches",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "role_permissions",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": true,
+      "name": "students",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "org_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actor_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "source",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "request_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "entity",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "entity_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "action",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "before",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "after",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "org_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "1",
+      "generated": null,
+      "identity": null,
+      "name": "version",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "created_by",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_by",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "deleted_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "code",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "org_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "role_permissions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "role_key",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "role_permissions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "permission",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "role_permissions"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "org_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "1",
+      "generated": null,
+      "identity": null,
+      "name": "version",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "created_by",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_by",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "deleted_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "branch_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "admission_no",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "full_name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "father_name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "gender",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "date",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "date_of_birth",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "b_form_no",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "section_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'active'",
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "type": "date",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "admitted_on",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "org_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "entity",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "entity_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "audit_log_entity_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "org_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "code",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "branches_code_uq",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "org_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "admission_no",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": "\"deleted_at\" is null",
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "students_admission_no_uq",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "org_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "section_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "students_section_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "branch_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "branches",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "students_branch_id_branches_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "columns": [
+        "org_id",
+        "role_key",
+        "permission"
+      ],
+      "nameExplicit": false,
+      "name": "role_permissions_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "role_permissions"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "audit_log_pkey",
+      "schema": "public",
+      "table": "audit_log",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "branches_pkey",
+      "schema": "public",
+      "table": "branches",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "students_pkey",
+      "schema": "public",
+      "table": "students",
+      "entityType": "pks"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "INSERT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": null,
+      "withCheck": "\"audit_log\".\"org_id\" = (select app.org_id())",
+      "name": "audit_log_insert",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "SELECT",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "\"audit_log\".\"org_id\" = (select app.org_id())",
+      "withCheck": null,
+      "name": "audit_log_read",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "audit_log"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "ALL",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "\"branches\".\"org_id\" = (select app.org_id())",
+      "withCheck": "\"branches\".\"org_id\" = (select app.org_id())",
+      "name": "branches_org",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "branches"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "ALL",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "\"role_permissions\".\"org_id\" = (select app.org_id())",
+      "withCheck": "\"role_permissions\".\"org_id\" = (select app.org_id())",
+      "name": "role_permissions_org",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "role_permissions"
+    },
+    {
+      "as": "PERMISSIVE",
+      "for": "ALL",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "\"students\".\"org_id\" = (select app.org_id())",
+      "withCheck": "\"students\".\"org_id\" = (select app.org_id())",
+      "name": "students_org",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "students"
+    },
+    {
+      "as": "RESTRICTIVE",
+      "for": "ALL",
+      "roles": [
+        "authenticated"
+      ],
+      "using": "((select app.all_branches()) or \"students\".\"branch_id\" = any ((select app.branch_ids())::uuid[]))",
+      "withCheck": "((select app.all_branches()) or \"students\".\"branch_id\" = any ((select app.branch_ids())::uuid[]))",
+      "name": "students_branch",
+      "entityType": "policies",
+      "schema": "public",
+      "table": "students"
+    }
+  ],
+  "renames": []
+}

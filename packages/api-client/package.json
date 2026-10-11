@@ -1,0 +1,20 @@
+{
+  "name": "@takhti/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Layer 6. Typed HTTP calls. Runs in browsers and mobile apps; never imports core or db.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@takhti/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@takhti/config": "workspace:*",
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,1122 @@
+<title>Kashi School Theme</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Lexend:wght@400;500;600&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap">
+<style>
+/* Layout concept: a ruled page. Square corners, one-pixel lines, a 4px grid; colour only for actions and status. */
+:root{--background:#f5f7f9;--foreground:#121a2b;--card:#ffffff;--card-foreground:#121a2b;--popover:#ffffff;--popover-foreground:#121a2b;--primary:#223ecb;--primary-foreground:#ffffff;--primary-hover:#1930ab;--link:#223ecb;--secondary:#eef0f4;--secondary-foreground:#121a2b;--muted:#eef0f4;--muted-foreground:#5c6372;--accent:#eaf0fe;--accent-foreground:#223ecb;--border:#dde0e5;--border-strong:#c0c4cc;--input:#898f9c;--ring:#3d63e4;--brand:#29b9c7;--brand-foreground:#0a152c;--brand-text:#046a77;--spark:#f7b828;--sidebar:#091541;--sidebar-foreground:#e3e8f2;--sidebar-muted:#99a4be;--sidebar-accent:#182d7f;--sidebar-accent-foreground:#ffffff;--sidebar-border:#192a5a;--sidebar-primary:#29b9c7;--table-header:#182e92;--table-header-foreground:#ffffff;--row-hover:#f2f6fe;--success:#006336;--success-subtle:#def9e6;--success-border:#a4dab5;--warning:#824c00;--warning-subtle:#fff1d2;--warning-border:#edc97b;--danger:#b31319;--danger-subtle:#ffecec;--danger-border:#fcc0bc;--info:#056374;--info-subtle:#ddf7fc;--info-border:#a0d9e2;--destructive:#c90f1a;--destructive-foreground:#ffffff;--chart-1:#3153d3;--chart-2:#e97125;--chart-3:#00a0a6;--chart-4:#dca81c;--chart-5:#c74c8e;--chart-grid:#e2e5e9;--logo-tile:#223ecb;--logo-page-1:#ffffff;--logo-page-2:#29b9c7;--logo-spark:#f7b828;--logo-inv-tile:#223ecb;--logo-inv-page-1:#ffffff;--logo-inv-page-2:#29b9c7;--logo-inv-spark:#f7b828}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--background:#0c111c;--foreground:#eceef4;--card:#121927;--card-foreground:#eceef4;--popover:#192132;--popover-foreground:#eceef4;--primary:#3e65ed;--primary-foreground:#ffffff;--primary-hover:#2f51d8;--link:#98b5fe;--secondary:#1e2638;--secondary-foreground:#eceef4;--muted:#1b2331;--muted-foreground:#a2abbd;--accent:#1a2950;--accent-foreground:#d0deff;--border:#273043;--border-strong:#3a455b;--input:#5d6981;--ring:#7ca0ff;--brand:#30c8cf;--brand-foreground:#0a152c;--brand-text:#5ddae0;--spark:#f7b828;--sidebar:#0e1c4c;--sidebar-foreground:#e3e8f2;--sidebar-muted:#9fabc5;--sidebar-accent:#1f3688;--sidebar-accent-foreground:#ffffff;--sidebar-border:#203263;--sidebar-primary:#30c8cf;--table-header:#1a2f7a;--table-header-foreground:#ffffff;--row-hover:#182137;--success:#72d699;--success-subtle:#0f2e1b;--success-border:#205335;--warning:#f1c45e;--warning-subtle:#362607;--warning-border:#624815;--danger:#ff9592;--danger-subtle:#3f1919;--danger-border:#7a3334;--info:#72cede;--info-subtle:#0a2b33;--info-border:#16505a;--destructive:#d22828;--destructive-foreground:#ffffff;--chart-1:#587eeb;--chart-2:#de6e29;--chart-3:#19a9b0;--chart-4:#b58b22;--chart-5:#cd5a97;--chart-grid:#262e3d;--logo-tile:#223ecb;--logo-page-1:#ffffff;--logo-page-2:#29b9c7;--logo-spark:#f7b828;--logo-inv-tile:#223ecb;--logo-inv-page-1:#ffffff;--logo-inv-page-2:#29b9c7;--logo-inv-spark:#f7b828;color-scheme:dark}}
+:root[data-theme="dark"]{--background:#0c111c;--foreground:#eceef4;--card:#121927;--card-foreground:#eceef4;--popover:#192132;--popover-foreground:#eceef4;--primary:#3e65ed;--primary-foreground:#ffffff;--primary-hover:#2f51d8;--link:#98b5fe;--secondary:#1e2638;--secondary-foreground:#eceef4;--muted:#1b2331;--muted-foreground:#a2abbd;--accent:#1a2950;--accent-foreground:#d0deff;--border:#273043;--border-strong:#3a455b;--input:#5d6981;--ring:#7ca0ff;--brand:#30c8cf;--brand-foreground:#0a152c;--brand-text:#5ddae0;--spark:#f7b828;--sidebar:#0e1c4c;--sidebar-foreground:#e3e8f2;--sidebar-muted:#9fabc5;--sidebar-accent:#1f3688;--sidebar-accent-foreground:#ffffff;--sidebar-border:#203263;--sidebar-primary:#30c8cf;--table-header:#1a2f7a;--table-header-foreground:#ffffff;--row-hover:#182137;--success:#72d699;--success-subtle:#0f2e1b;--success-border:#205335;--warning:#f1c45e;--warning-subtle:#362607;--warning-border:#624815;--danger:#ff9592;--danger-subtle:#3f1919;--danger-border:#7a3334;--info:#72cede;--info-subtle:#0a2b33;--info-border:#16505a;--destructive:#d22828;--destructive-foreground:#ffffff;--chart-1:#587eeb;--chart-2:#de6e29;--chart-3:#19a9b0;--chart-4:#b58b22;--chart-5:#cd5a97;--chart-grid:#262e3d;--logo-tile:#223ecb;--logo-page-1:#ffffff;--logo-page-2:#29b9c7;--logo-spark:#f7b828;--logo-inv-tile:#223ecb;--logo-inv-page-1:#ffffff;--logo-inv-page-2:#29b9c7;--logo-inv-spark:#f7b828;color-scheme:dark}
+body[data-mode="light"]{--background:#f5f7f9;--foreground:#121a2b;--card:#ffffff;--card-foreground:#121a2b;--popover:#ffffff;--popover-foreground:#121a2b;--primary:#223ecb;--primary-foreground:#ffffff;--primary-hover:#1930ab;--link:#223ecb;--secondary:#eef0f4;--secondary-foreground:#121a2b;--muted:#eef0f4;--muted-foreground:#5c6372;--accent:#eaf0fe;--accent-foreground:#223ecb;--border:#dde0e5;--border-strong:#c0c4cc;--input:#898f9c;--ring:#3d63e4;--brand:#29b9c7;--brand-foreground:#0a152c;--brand-text:#046a77;--spark:#f7b828;--sidebar:#091541;--sidebar-foreground:#e3e8f2;--sidebar-muted:#99a4be;--sidebar-accent:#182d7f;--sidebar-accent-foreground:#ffffff;--sidebar-border:#192a5a;--sidebar-primary:#29b9c7;--table-header:#182e92;--table-header-foreground:#ffffff;--row-hover:#f2f6fe;--success:#006336;--success-subtle:#def9e6;--success-border:#a4dab5;--warning:#824c00;--warning-subtle:#fff1d2;--warning-border:#edc97b;--danger:#b31319;--danger-subtle:#ffecec;--danger-border:#fcc0bc;--info:#056374;--info-subtle:#ddf7fc;--info-border:#a0d9e2;--destructive:#c90f1a;--destructive-foreground:#ffffff;--chart-1:#3153d3;--chart-2:#e97125;--chart-3:#00a0a6;--chart-4:#dca81c;--chart-5:#c74c8e;--chart-grid:#e2e5e9;--logo-tile:#223ecb;--logo-page-1:#ffffff;--logo-page-2:#29b9c7;--logo-spark:#f7b828;--logo-inv-tile:#223ecb;--logo-inv-page-1:#ffffff;--logo-inv-page-2:#29b9c7;--logo-inv-spark:#f7b828;color-scheme:light}
+body[data-mode="dark"]{--background:#0c111c;--foreground:#eceef4;--card:#121927;--card-foreground:#eceef4;--popover:#192132;--popover-foreground:#eceef4;--primary:#3e65ed;--primary-foreground:#ffffff;--primary-hover:#2f51d8;--link:#98b5fe;--secondary:#1e2638;--secondary-foreground:#eceef4;--muted:#1b2331;--muted-foreground:#a2abbd;--accent:#1a2950;--accent-foreground:#d0deff;--border:#273043;--border-strong:#3a455b;--input:#5d6981;--ring:#7ca0ff;--brand:#30c8cf;--brand-foreground:#0a152c;--brand-text:#5ddae0;--spark:#f7b828;--sidebar:#0e1c4c;--sidebar-foreground:#e3e8f2;--sidebar-muted:#9fabc5;--sidebar-accent:#1f3688;--sidebar-accent-foreground:#ffffff;--sidebar-border:#203263;--sidebar-primary:#30c8cf;--table-header:#1a2f7a;--table-header-foreground:#ffffff;--row-hover:#182137;--success:#72d699;--success-subtle:#0f2e1b;--success-border:#205335;--warning:#f1c45e;--warning-subtle:#362607;--warning-border:#624815;--danger:#ff9592;--danger-subtle:#3f1919;--danger-border:#7a3334;--info:#72cede;--info-subtle:#0a2b33;--info-border:#16505a;--destructive:#d22828;--destructive-foreground:#ffffff;--chart-1:#587eeb;--chart-2:#de6e29;--chart-3:#19a9b0;--chart-4:#b58b22;--chart-5:#cd5a97;--chart-grid:#262e3d;--logo-tile:#223ecb;--logo-page-1:#ffffff;--logo-page-2:#29b9c7;--logo-spark:#f7b828;--logo-inv-tile:#223ecb;--logo-inv-page-1:#ffffff;--logo-inv-page-2:#29b9c7;--logo-inv-spark:#f7b828;color-scheme:dark}
+.chip-kashi{background:linear-gradient(90deg,#223ecb 50%,#29b9c7 50%)}
+body[data-palette="sabz"][data-mode="light"]{--background:#f4f8f6;--foreground:#072018;--card:#ffffff;--card-foreground:#072018;--popover:#ffffff;--popover-foreground:#072018;--primary:#005c3d;--primary-foreground:#ffffff;--primary-hover:#024930;--link:#005c3d;--secondary:#ecf1ef;--secondary-foreground:#072018;--muted:#ecf1ef;--muted-foreground:#566861;--accent:#e4f5ec;--accent-foreground:#005c3d;--border:#dbe1df;--border-strong:#bdc7c3;--input:#84938d;--ring:#03875b;--brand:#eab532;--brand-foreground:#001c13;--brand-text:#865900;--spark:#f7b828;--sidebar:#032318;--sidebar-foreground:#e0ebe5;--sidebar-muted:#8fad9d;--sidebar-accent:#00442c;--sidebar-accent-foreground:#ffffff;--sidebar-border:#13382a;--sidebar-primary:#eab532;--table-header:#00472e;--table-header-foreground:#ffffff;--row-hover:#eff8f3;--success:#006336;--success-subtle:#def9e6;--success-border:#a4dab5;--warning:#824c00;--warning-subtle:#fff1d2;--warning-border:#edc97b;--danger:#b31319;--danger-subtle:#ffecec;--danger-border:#fcc0bc;--info:#056374;--info-subtle:#ddf7fc;--info-border:#a0d9e2;--destructive:#c90f1a;--destructive-foreground:#ffffff;--chart-1:#3153d3;--chart-2:#e97125;--chart-3:#00a0a6;--chart-4:#dca81c;--chart-5:#c74c8e;--chart-grid:#e1e6e4;--logo-tile:#005c3d;--logo-page-1:#ffffff;--logo-page-2:#eab532;--logo-spark:#eab532;--logo-inv-tile:#005c3d;--logo-inv-page-1:#ffffff;--logo-inv-page-2:#eab532;--logo-inv-spark:#eab532;color-scheme:light}
+body[data-palette="sabz"][data-mode="dark"]{--background:#061510;--foreground:#eaf0ee;--card:#091e17;--card-foreground:#eaf0ee;--popover:#0f271f;--popover-foreground:#eaf0ee;--primary:#007d54;--primary-foreground:#ffffff;--primary-hover:#036946;--link:#6ed6a6;--secondary:#132c24;--secondary-foreground:#eaf0ee;--muted:#132821;--muted-foreground:#9ab1a8;--accent:#013521;--accent-foreground:#c2e9d4;--border:#1c362d;--border-strong:#2e4c42;--input:#527165;--ring:#47be8b;--brand:#f0bb3b;--brand-foreground:#001c13;--brand-text:#f4c352;--spark:#f7b828;--sidebar:#02291c;--sidebar-foreground:#e0ebe5;--sidebar-muted:#95b3a3;--sidebar-accent:#024930;--sidebar-accent-foreground:#ffffff;--sidebar-border:#143e2e;--sidebar-primary:#f0bb3b;--table-header:#00442c;--table-header-foreground:#ffffff;--row-hover:#09281b;--success:#72d699;--success-subtle:#0f2e1b;--success-border:#205335;--warning:#f1c45e;--warning-subtle:#362607;--warning-border:#624815;--danger:#ff9592;--danger-subtle:#3f1919;--danger-border:#7a3334;--info:#72cede;--info-subtle:#0a2b33;--info-border:#16505a;--destructive:#d22828;--destructive-foreground:#ffffff;--chart-1:#587eeb;--chart-2:#de6e29;--chart-3:#19a9b0;--chart-4:#b58b22;--chart-5:#cd5a97;--chart-grid:#1e332b;--logo-tile:#005c3d;--logo-page-1:#ffffff;--logo-page-2:#eab532;--logo-spark:#eab532;--logo-inv-tile:#005c3d;--logo-inv-page-1:#ffffff;--logo-inv-page-2:#eab532;--logo-inv-spark:#eab532;color-scheme:dark}
+.chip-sabz{background:linear-gradient(90deg,#005c3d 50%,#eab532 50%)}
+body[data-palette="siyahi"][data-mode="light"]{--background:#f5f7fa;--foreground:#131a2b;--card:#ffffff;--card-foreground:#131a2b;--popover:#ffffff;--popover-foreground:#131a2b;--primary:#171e32;--primary-foreground:#ffffff;--primary-hover:#28324a;--link:#202c4c;--secondary:#eef0f4;--secondary-foreground:#131a2b;--muted:#eef0f4;--muted-foreground:#5d6372;--accent:#eaedf2;--accent-foreground:#131a2b;--border:#dde0e5;--border-strong:#c0c4cc;--input:#8a8f9c;--ring:#546286;--brand:#fa9524;--brand-foreground:#0c142d;--brand-text:#9f5102;--spark:#fa9524;--sidebar:#101624;--sidebar-foreground:#e3e8f2;--sidebar-muted:#99a4be;--sidebar-accent:#252d42;--sidebar-accent-foreground:#ffffff;--sidebar-border:#21283a;--sidebar-primary:#fa9524;--table-header:#1f2638;--table-header-foreground:#ffffff;--row-hover:#f3f5f9;--success:#006336;--success-subtle:#def9e6;--success-border:#a4dab5;--warning:#824c00;--warning-subtle:#fff1d2;--warning-border:#edc97b;--danger:#b31319;--danger-subtle:#ffecec;--danger-border:#fcc0bc;--info:#056374;--info-subtle:#ddf7fc;--info-border:#a0d9e2;--destructive:#c90f1a;--destructive-foreground:#ffffff;--chart-1:#3153d3;--chart-2:#e97125;--chart-3:#00a0a6;--chart-4:#dca81c;--chart-5:#c74c8e;--chart-grid:#e3e4e9;--logo-tile:#171e32;--logo-page-1:#ffffff;--logo-page-2:#fa9524;--logo-spark:#fa9524;--logo-inv-tile:#fa9524;--logo-inv-page-1:#0e1528;--logo-inv-page-2:#ffffff;--logo-inv-spark:#0e1528;color-scheme:light}
+body[data-palette="siyahi"][data-mode="dark"]{--background:#0d111c;--foreground:#eceef4;--card:#131927;--card-foreground:#eceef4;--popover:#1a2132;--popover-foreground:#eceef4;--primary:#e9ebf1;--primary-foreground:#0e1528;--primary-hover:#cdd1d9;--link:#d8deec;--secondary:#1f2638;--secondary-foreground:#eceef4;--muted:#1c2232;--muted-foreground:#a3abbd;--accent:#232b3d;--accent-foreground:#eceef4;--border:#283043;--border-strong:#3b455b;--input:#5e6981;--ring:#b5bed2;--brand:#ff9d35;--brand-foreground:#0c142d;--brand-text:#ffb161;--spark:#fa9524;--sidebar:#171d2f;--sidebar-foreground:#e3e8f2;--sidebar-muted:#9fabc5;--sidebar-accent:#2b354d;--sidebar-accent-foreground:#ffffff;--sidebar-border:#273045;--sidebar-primary:#ff9d35;--table-header:#273045;--table-header-foreground:#ffffff;--row-hover:#1b2130;--success:#72d699;--success-subtle:#0f2e1b;--success-border:#205335;--warning:#f1c45e;--warning-subtle:#362607;--warning-border:#624815;--danger:#ff9592;--danger-subtle:#3f1919;--danger-border:#7a3334;--info:#72cede;--info-subtle:#0a2b33;--info-border:#16505a;--destructive:#d22828;--destructive-foreground:#ffffff;--chart-1:#587eeb;--chart-2:#de6e29;--chart-3:#19a9b0;--chart-4:#b58b22;--chart-5:#cd5a97;--chart-grid:#272e3d;--logo-tile:#fa9524;--logo-page-1:#0e1528;--logo-page-2:#ffffff;--logo-spark:#0e1528;--logo-inv-tile:#fa9524;--logo-inv-page-1:#0e1528;--logo-inv-page-2:#ffffff;--logo-inv-spark:#0e1528;color-scheme:dark}
+.chip-siyahi{background:linear-gradient(90deg,#171e32 50%,#fa9524 50%)}
+
+:root {
+  --font-display: "Lexend", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Urdu Typesetting", serif;
+  --shadow-float: 0 12px 28px rgb(0 0 0 / 0.16), 0 2px 6px rgb(0 0 0 / 0.1);
+}
+
+*, *::before, *::after { box-sizing: border-box; border-radius: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font: 400 14px/1.5 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+a { color: var(--link); text-underline-offset: 3px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.i { width: 18px; height: 18px; fill: currentColor; flex: none; }
+.i-sm { width: 16px; height: 16px; }
+.num { font-variant-numeric: tabular-nums; }
+.code { font-family: var(--font-mono); font-size: 12px; }
+.muted { color: var(--muted-foreground); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.label {
+  font: 600 11px/1.2 var(--font-sans);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.wrap { max-width: 1320px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 32px); }
+
+/* ---------- page bar ---------- */
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.bar-in { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; min-height: 52px; padding-block: 8px; }
+.bar-brand { display: flex; align-items: center; gap: 10px; color: var(--foreground); text-decoration: none; }
+.bar-brand b { font: 600 16px/1 var(--font-display); letter-spacing: -0.01em; }
+.bar-brand span { font-size: 12.5px; color: var(--muted-foreground); }
+.bar-nav { display: flex; gap: 2px; margin-right: auto; }
+.bar-nav a { padding: 6px 10px; font-size: 13px; color: var(--muted-foreground); text-decoration: none; }
+.bar-nav a:hover { color: var(--foreground); background: var(--muted); }
+.bar-ctl { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+@media (max-width: 1040px) { .bar-nav { display: none; } }
+
+/* ---------- shared controls ---------- */
+.seg { display: inline-flex; border: 1px solid var(--border-strong); background: var(--card); }
+.seg button {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 10px;
+  border: 0; border-right: 1px solid var(--border-strong);
+  background: transparent; color: var(--muted-foreground);
+  font-size: 12.5px; cursor: pointer; white-space: nowrap;
+}
+.seg button:last-child { border-right: 0; }
+.seg button:hover { color: var(--foreground); background: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-foreground); font-weight: 600; }
+.seg .count { font: 400 11.5px var(--font-mono); color: var(--muted-foreground); }
+.chip { width: 14px; height: 10px; flex: none; outline: 1px solid var(--border-strong); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 32px; padding: 0 12px;
+  border: 1px solid transparent;
+  font: 500 13px/1 var(--font-sans); white-space: nowrap; cursor: pointer; text-decoration: none;
+}
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { background: var(--card); color: var(--foreground); border-color: var(--border-strong); }
+.btn-outline:hover { background: var(--muted); }
+.btn-ghost { background: transparent; color: var(--foreground); }
+.btn-ghost:hover { background: var(--muted); }
+.btn-danger { background: var(--destructive); color: var(--destructive-foreground); }
+.btn-sm { height: 28px; padding: 0 10px; font-size: 12.5px; gap: 6px; }
+.btn-lg { height: 40px; padding: 0 16px; font-size: 14px; }
+.btn-icon { width: 32px; padding: 0; }
+.btn-icon.btn-sm { width: 28px; }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.input, .select {
+  height: 32px; width: 100%; padding: 0 10px;
+  background: var(--card); color: var(--foreground);
+  border: 1px solid var(--input);
+  font-size: 13px;
+}
+.input::placeholder { color: var(--muted-foreground); }
+.input:focus-visible, .select:focus-visible { outline: 2px solid var(--ring); outline-offset: -1px; }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.select { appearance: none; padding-right: 30px; cursor: pointer; }
+.select-wrap, .search { position: relative; display: block; }
+.select-wrap .i { position: absolute; right: 7px; top: 7px; pointer-events: none; color: var(--muted-foreground); }
+.search .i { position: absolute; left: 8px; top: 7px; color: var(--muted-foreground); pointer-events: none; }
+.search .input { padding-left: 32px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field .hint { font-size: 12px; color: var(--muted-foreground); }
+.field .hint.error { color: var(--danger); }
+
+.check, .radio, .switch { appearance: none; margin: 0; flex: none; cursor: pointer; background: var(--card); }
+.check { width: 16px; height: 16px; border: 1px solid var(--input); display: inline-grid; place-content: center; }
+.check::after { content: ""; width: 10px; height: 10px; background: var(--primary-foreground); clip-path: polygon(13% 50%, 0 64%, 38% 100%, 100% 22%, 87% 9%, 37% 72%); transform: scale(0); }
+.check:checked { background: var(--primary); border-color: var(--primary); }
+.check:checked::after { transform: scale(1); }
+/* A radio is a diamond, so it can never be mistaken for a checkbox even with square corners. */
+.radio { width: 13px; height: 13px; margin: 2px 3px; rotate: 45deg; border: 1px solid var(--input); display: inline-grid; place-content: center; }
+.radio::after { content: ""; width: 5px; height: 5px; background: var(--primary); transform: scale(0); }
+.radio:checked { border-color: var(--primary); }
+.radio:checked::after { transform: scale(1); }
+.switch { width: 32px; height: 18px; background: var(--input); position: relative; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: var(--card); transition: translate 0.12s; }
+.switch:checked { background: var(--primary); }
+.switch:checked::after { translate: 14px 0; background: var(--primary-foreground); }
+.choice { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 22px; padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--muted); color: var(--muted-foreground);
+  font: 500 12px/1 var(--font-sans); white-space: nowrap;
+}
+.badge::before { content: ""; width: 6px; height: 6px; background: currentColor; }
+.badge.success { color: var(--success); background: var(--success-subtle); border-color: var(--success-border); }
+.badge.warning { color: var(--warning); background: var(--warning-subtle); border-color: var(--warning-border); }
+.badge.danger { color: var(--danger); background: var(--danger-subtle); border-color: var(--danger-border); }
+.badge.info { color: var(--info); background: var(--info-subtle); border-color: var(--info-border); }
+.badge.plain::before { display: none; }
+
+.avatar {
+  display: inline-grid; place-content: center; flex: none;
+  width: 28px; height: 28px;
+  background: var(--brand); color: var(--brand-foreground);
+  font: 600 11px/1 var(--font-sans); letter-spacing: 0.02em;
+}
+.avatar.sm { width: 22px; height: 22px; font-size: 10px; }
+.meter { height: 6px; background: var(--accent); }
+.meter > i { display: block; height: 100%; background: var(--primary); }
+
+/* ---------- logo ---------- */
+.mark { display: block; flex: none; }
+.on-dark {
+  --logo-tile: var(--logo-inv-tile);
+  --logo-page-1: var(--logo-inv-page-1);
+  --logo-page-2: var(--logo-inv-page-2);
+  --logo-spark: var(--logo-inv-spark);
+}
+.wordmark { font: 600 17px/1 var(--font-display); letter-spacing: -0.015em; }
+
+/* ---------- sections ---------- */
+.intro { padding-block: 40px 28px; display: grid; gap: 14px; }
+.intro h1 { font: 500 clamp(34px, 5vw, 52px)/1.05 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
+.intro h1 mark { background: var(--spark); color: var(--brand-foreground); padding: 0 0.14em; }
+.lede { max-width: 66ch; font-size: 16px; color: var(--muted-foreground); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); border: 1px solid var(--border); background: var(--card); margin-top: 8px; }
+.facts li { padding: 12px 16px; border-left: 1px solid var(--border); margin-left: -1px; display: grid; gap: 2px; font-size: 12.5px; color: var(--muted-foreground); }
+.facts b { font: 600 22px/1.1 var(--font-sans); color: var(--foreground); }
+
+.section { padding-block: 28px; display: grid; gap: 16px; }
+.section-head { display: grid; gap: 4px; }
+.section-head h2 { font: 500 22px/1.2 var(--font-display); letter-spacing: -0.015em; }
+.section-head p { max-width: 70ch; color: var(--muted-foreground); }
+.grid { display: grid; gap: 16px; }
+.section > *, .intro > *, .grid > *, .card-body > * { min-width: 0; }
+.cols-2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.cols-3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.card { background: var(--card); border: 1px solid var(--border); min-width: 0; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.card-head h3 { font: 600 13px/1.3 var(--font-sans); }
+.card-body { padding: 16px; display: grid; gap: 14px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* ---------- app preview ---------- */
+.mock { border: 1px solid var(--border-strong); background: var(--background); overflow-x: auto; }
+.app { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-width: 1120px; }
+.side { background: var(--sidebar); color: var(--sidebar-foreground); display: flex; flex-direction: column; border-right: 1px solid var(--sidebar-border); }
+.side-brand { height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--sidebar-border); }
+.side-brand .wordmark { color: #fff; font-size: 16px; }
+.side-branch {
+  margin: 10px 8px 2px; padding: 7px 8px;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  background: transparent; color: inherit; border: 1px solid var(--sidebar-border); cursor: pointer;
+}
+.side-branch:hover { background: var(--sidebar-accent); }
+.side-branch span.t { display: grid; min-width: 0; margin-right: auto; }
+.side-branch b { font: 600 12.5px/1.3 var(--font-sans); }
+.side-branch small { font-size: 11px; color: var(--sidebar-muted); }
+.side-branch .i { color: var(--sidebar-muted); }
+.nav-label { padding: 16px 16px 6px; font: 600 10.5px/1 var(--font-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sidebar-muted); }
+.nav { display: grid; gap: 1px; }
+.nav a {
+  display: flex; align-items: center; gap: 10px;
+  height: 32px; margin: 0 8px; padding: 0 8px;
+  color: var(--sidebar-foreground); text-decoration: none; font-size: 13px;
+}
+.nav a:hover { background: color-mix(in oklab, var(--sidebar-accent) 55%, transparent); }
+.nav a[aria-current="page"] { background: var(--sidebar-accent); color: var(--sidebar-accent-foreground); font-weight: 500; box-shadow: inset 2px 0 0 var(--sidebar-primary); }
+.nav .i { color: var(--sidebar-muted); }
+.nav a[aria-current="page"] .i { color: inherit; }
+.nav-count { margin-left: auto; padding: 1px 6px; background: var(--sidebar-primary); color: var(--brand-foreground); font: 600 11px/1.4 var(--font-sans); }
+.side-foot { margin-top: auto; padding: 8px 0 10px; border-top: 1px solid var(--sidebar-border); display: grid; gap: 1px; }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+.top { height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 20px; background: var(--card); border-bottom: 1px solid var(--border); }
+.crumbs { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--muted-foreground); margin-right: auto; }
+.crumbs b { color: var(--foreground); font-weight: 600; }
+.top .search { width: 240px; }
+.content { padding: 20px; display: grid; gap: 16px; }
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.page-head h3 { font: 500 20px/1.25 var(--font-display); letter-spacing: -0.01em; }
+.page-head p { font-size: 12.5px; color: var(--muted-foreground); }
+
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--card); border: 1px solid var(--border); }
+.kpi { padding: 14px 16px; display: grid; gap: 6px; align-content: start; border-left: 1px solid var(--border); }
+.kpi:first-child { border-left: 0; }
+.kpi .value { font: 600 24px/1.1 var(--font-sans); letter-spacing: -0.01em; }
+.kpi .value small { font: 500 13px/1 var(--font-sans); color: var(--muted-foreground); margin-right: 3px; }
+.kpi .sub { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted-foreground); }
+.kpi .sub.bad { color: var(--danger); }
+.kpi .sub .i { width: 14px; height: 14px; }
+
+.panel { background: var(--card); border: 1px solid var(--border); min-width: 0; }
+.panel-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.panel-row .spacer { margin-right: auto; }
+.panel-row .search { width: 260px; }
+.panel-row .select-wrap { width: 150px; }
+.table-wrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data th {
+  height: 36px; padding: 0 12px; text-align: left; white-space: nowrap;
+  background: var(--table-header); color: var(--table-header-foreground);
+  font: 600 12px/1 var(--font-sans); letter-spacing: 0.01em;
+}
+.data td { height: 40px; padding: 0 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.data tbody tr:hover { background: var(--row-hover); }
+.data tbody tr[aria-selected="true"] { background: var(--accent); }
+.data .r { text-align: right; }
+.data .who { display: grid; line-height: 1.25; }
+.data .who small { font-size: 11.5px; color: var(--muted-foreground); }
+.data .late { color: var(--danger); }
+.data th .check { border-color: color-mix(in oklab, var(--table-header-foreground) 60%, transparent); background: transparent; }
+.panel-foot { display: flex; align-items: center; gap: 12px; padding: 8px 12px; font-size: 12.5px; color: var(--muted-foreground); }
+.panel-foot .select-wrap { width: 68px; }
+.panel-foot .select { height: 28px; font-size: 12.5px; }
+.panel-foot .select-wrap .i { top: 5px; }
+.pager { display: inline-flex; gap: 4px; }
+
+/* ---------- brand ---------- */
+.brand-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); border: 1px solid var(--border); }
+.brand-tile { min-height: 168px; padding: 16px; display: grid; align-content: space-between; gap: 20px; border-left: 1px solid var(--border); margin-left: -1px; }
+.brand-tile.paper { background: var(--card); }
+.brand-tile.ink { background: var(--sidebar); color: #fff; }
+.brand-tile.solid { background: var(--logo-tile); color: #fff; }
+.brand-tile.ink .label, .brand-tile.solid .label { color: inherit; opacity: 0.75; }
+.lockup { display: flex; align-items: center; gap: 14px; }
+.lockup .wordmark { font-size: 30px; }
+.lockup small { display: block; margin-top: 6px; font: 600 10.5px/1 var(--font-sans); letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.7; }
+.lockup-ur { font: 600 30px/1.9 var(--font-urdu); }
+.sizes { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+.sizes figure { display: grid; gap: 6px; justify-items: start; font: 400 11px var(--font-mono); color: var(--muted-foreground); }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border: 1px solid var(--border); }
+.role { display: grid; grid-template-rows: 56px auto; border-left: 1px solid var(--border); margin-left: -1px; background: var(--card); }
+.role div { padding: 10px 12px; display: grid; gap: 2px; font-size: 12px; color: var(--muted-foreground); }
+.role b { font: 600 13px/1.3 var(--font-sans); color: var(--foreground); }
+.role .ur { font: 400 15px/1.9 var(--font-urdu); color: var(--foreground); justify-self: start; }
+body:not([data-palette="kashi"]) .kashi-only { display: none; }
+
+/* ---------- colour ---------- */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.swatch { border: 1px solid var(--border); background: var(--card); min-width: 0; }
+.swatch i { display: block; height: 44px; border-bottom: 1px solid var(--border); }
+.swatch div { padding: 8px 10px; display: grid; gap: 1px; }
+.swatch b { font: 500 12px/1.3 var(--font-mono); overflow-wrap: anywhere; }
+.swatch span { font: 400 11.5px/1.3 var(--font-mono); color: var(--muted-foreground); }
+.group-title { margin-top: 6px; }
+.states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.state-list { display: grid; gap: 0; }
+.state-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 16px; border-top: 1px solid var(--border); font-size: 13px; }
+.state-list li:first-child { border-top: 0; }
+
+/* ---------- type ---------- */
+.specimen { display: grid; }
+.specimen > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 12px 16px; border-top: 1px solid var(--border); }
+.specimen > div:first-child { border-top: 0; }
+.specimen .what { display: grid; gap: 2px; font-size: 12px; color: var(--muted-foreground); }
+.specimen .what b { font: 600 12.5px var(--font-sans); color: var(--foreground); }
+.t-display { font: 500 30px/1.15 var(--font-display); letter-spacing: -0.02em; }
+.t-title { font: 500 20px/1.25 var(--font-display); letter-spacing: -0.01em; }
+.t-body { font-size: 14px; max-width: 62ch; }
+.t-ui { font-size: 13px; }
+.t-urdu { font: 400 19px/2.1 var(--font-urdu); }
+@media (max-width: 560px) { .specimen > div { grid-template-columns: 1fr; gap: 4px; } }
+
+/* ---------- components ---------- */
+.tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab { height: 36px; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; color: var(--muted-foreground); font-size: 13px; cursor: pointer; white-space: nowrap; }
+.tab:hover { color: var(--foreground); }
+.tab[aria-selected="true"] { color: var(--foreground); border-bottom-color: var(--primary); font-weight: 600; }
+.note { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px 12px; border: 1px solid; border-left-width: 3px; font-size: 13px; }
+.note b { display: block; font-weight: 600; }
+.note.info { color: var(--info); background: var(--info-subtle); border-color: var(--info-border); border-left-color: var(--info); }
+.note.success { color: var(--success); background: var(--success-subtle); border-color: var(--success-border); border-left-color: var(--success); }
+.note.warning { color: var(--warning); background: var(--warning-subtle); border-color: var(--warning-border); border-left-color: var(--warning); }
+.note.danger { color: var(--danger); background: var(--danger-subtle); border-color: var(--danger-border); border-left-color: var(--danger); }
+.note p { color: var(--foreground); }
+.menu { width: 220px; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border-strong); box-shadow: var(--shadow-float); padding: 4px; display: grid; gap: 1px; }
+.menu button { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 8px; border: 0; background: none; font-size: 13px; text-align: left; cursor: pointer; }
+.menu button:hover, .menu button.hover { background: var(--accent); color: var(--accent-foreground); }
+.menu button kbd { margin-left: auto; font: 400 11px var(--font-mono); color: var(--muted-foreground); }
+.menu hr { border: 0; border-top: 1px solid var(--border); margin: 3px -4px; }
+.menu .danger { color: var(--danger); }
+.dialog { max-width: 420px; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border-strong); box-shadow: var(--shadow-float); }
+.dialog header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.dialog h4 { font: 500 16px/1.3 var(--font-display); }
+.dialog .body { padding: 16px; display: grid; gap: 14px; }
+.dialog footer { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--muted); }
+.toast { display: flex; align-items: center; gap: 10px; max-width: 360px; padding: 10px 12px; background: var(--sidebar); color: #fff; border-left: 3px solid var(--brand); box-shadow: var(--shadow-float); font-size: 13px; }
+.toast .btn { margin-left: auto; color: #fff; }
+.toast .btn:hover { background: rgb(255 255 255 / 0.14); }
+.tip { display: inline-block; padding: 5px 8px; background: var(--foreground); color: var(--background); font-size: 12px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+
+/* ---------- charts ---------- */
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font: 400 11px var(--font-sans); fill: var(--muted-foreground); }
+.chart .val { font-weight: 600; fill: var(--foreground); }
+.chart .grid { stroke: var(--chart-grid); stroke-width: 1; }
+.chart .hit { fill: transparent; cursor: default; }
+.chart .hit:focus-visible { outline: 2px solid var(--ring); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted-foreground); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 3px; }
+.tooltip { position: absolute; z-index: 2; pointer-events: none; min-width: 120px; padding: 6px 8px; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border-strong); box-shadow: var(--shadow-float); font-size: 12px; display: grid; gap: 2px; }
+.tooltip b { font-weight: 600; }
+.tooltip span { display: flex; align-items: center; gap: 6px; }
+.tooltip i { width: 8px; height: 8px; flex: none; }
+.stack { display: flex; gap: 2px; height: 14px; }
+.stack i { display: block; }
+
+/* ---------- rules ---------- */
+.rules { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rules th, .rules td { text-align: left; vertical-align: top; padding: 9px 16px; border-top: 1px solid var(--border); }
+.rules tr:first-child th, .rules tr:first-child td { border-top: 0; }
+.rules th { width: 150px; font-weight: 600; white-space: nowrap; }
+.scale { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.scale figure { display: grid; gap: 6px; justify-items: center; font: 400 11px var(--font-mono); color: var(--muted-foreground); }
+.scale i { display: block; background: var(--primary); height: 28px; }
+.foot { padding-block: 24px 40px; color: var(--muted-foreground); font-size: 12.5px; border-top: 1px solid var(--border); margin-top: 16px; }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .switch::after { transition: none; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="mark" viewBox="0 0 48 48"><rect width="48" height="48" fill="var(--logo-tile)"/><path d="M8 16 22.5 21V40L8 35Z" fill="var(--logo-page-1)"/><path d="M40 16 25.5 21V40L40 35Z" fill="var(--logo-page-2)"/><path d="M24 6 29 11 24 16 19 11Z" fill="var(--logo-spark)"/></symbol>
+<symbol id="mark-bare" viewBox="0 0 48 48"><path d="M8 16 22.5 21V40L8 35Z" fill="#fff"/><path d="M40 16 25.5 21V40L40 35Z" fill="#fff" fill-opacity="0.55"/><path d="M24 6 29 11 24 16 19 11Z" fill="#fff"/></symbol>
+<symbol id="i-add" viewBox="0 -960 960 960"><path d="M450-450H200v-60h250v-250h60v250h250v60H510v250h-60v-250Z"/></symbol>
+<symbol id="i-arrow_downward" viewBox="0 -960 960 960"><path d="M450-800v526L202-522l-42 42 320 320 320-320-42-42-248 248v-526h-60Z"/></symbol>
+<symbol id="i-arrow_upward" viewBox="0 -960 960 960"><path d="M450-160v-526L202-438l-42-42 320-320 320 320-42 42-248-248v526h-60Z"/></symbol>
+<symbol id="i-badge" viewBox="0 -960 960 960"><path d="M232-247h239v-14q0-18-9-32t-23-19q-32-11-50-14.5t-35-3.5q-19 0-40.5 4.5T265-312q-15 5-24 19t-9 32v14Zm336-67h170v-50H568v50Zm-214-50q22.5 0 38.25-15.75T408-418q0-22.5-15.75-38.25T354-472q-22.5 0-38.25 15.75T300-418q0 22.5 15.75 38.25T354-364Zm214-63h170v-50H568v50ZM80-80v-600h310v-200h180v200h310v600H80Zm60-60h680v-480H570v90H390v-90H140v480Zm310-450h60v-230h-60v230Zm30 210Z"/></symbol>
+<symbol id="i-bar_chart" viewBox="0 -960 960 960"><path d="M660-160v-280h140v280H660Zm-250 0v-640h140v640H410Zm-250 0v-440h140v440H160Z"/></symbol>
+<symbol id="i-calendar_month" viewBox="0 -960 960 960"><path d="M440-400v-80h80v80h-80Zm-160 0v-80h80v80h-80Zm320 0v-80h80v80h-80ZM440-240v-80h80v80h-80Zm-160 0v-80h80v80h-80Zm320 0v-80h80v80h-80ZM120-80v-740h125v-60h65v60h340v-60h65v60h125v740H120Zm60-60h600v-430H180v430Zm0-490h600v-130H180v130Zm0 0v-130 130Z"/></symbol>
+<symbol id="i-check" viewBox="0 -960 960 960"><path d="M378-246 154-470l43-43 181 181 384-384 43 43-427 427Z"/></symbol>
+<symbol id="i-chevron_left" viewBox="0 -960 960 960"><path d="M561-240 320-481l241-241 43 43-198 198 198 198-43 43Z"/></symbol>
+<symbol id="i-chevron_right" viewBox="0 -960 960 960"><path d="M530-481 332-679l43-43 241 241-241 241-43-43 198-198Z"/></symbol>
+<symbol id="i-close" viewBox="0 -960 960 960"><path d="m249-207-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></symbol>
+<symbol id="i-dark_mode" viewBox="0 -960 960 960"><path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q8 0 17 .5t23 1.5q-36 32-56 79t-20 99q0 90 63 153t153 63q52 0 99-18.5t79-51.5q1 12 1.5 19.5t.5 14.5q0 150-105 255T480-120Zm0-60q109 0 190-67.5T771-406q-25 11-53.67 16.5Q688.67-384 660-384q-114.69 0-195.34-80.66Q384-545.31 384-660q0-24 5-51.5t18-62.5q-98 27-162.5 109.5T180-480q0 125 87.5 212.5T480-180Zm-4-297Z"/></symbol>
+<symbol id="i-dashboard" viewBox="0 -960 960 960"><path d="M510-570v-270h330v270H510ZM120-450v-390h330v390H120Zm390 330v-390h330v390H510Zm-390 0v-270h330v270H120Zm60-390h210v-270H180v270Zm390 330h210v-270H570v270Zm0-450h210v-150H570v150ZM180-180h210v-150H180v150Zm210-330Zm180-120Zm0 180ZM390-330Z"/></symbol>
+<symbol id="i-directions_bus" viewBox="0 -960 960 960"><path d="M216-120v-111q-29-16-42.5-46T160-341v-397q0-73.66 76.5-107.83T481-880q166 0 242.5 34T800-738v397q0 34-13.5 64T744-231v111h-86v-82H302v82h-86Zm265-644h259-520 261Zm177 293H220h520-82Zm-438-60h520v-173H220v173Zm106.06 219Q349-312 365-328.06q16-16.06 16-39T364.94-406q-16.06-16-39-16T287-405.94q-16 16.06-16 39T287.06-328q16.06 16 39 16Zm308 0Q657-312 673-328.06q16-16.06 16-39T672.94-406q-16.06-16-39-16T595-405.94q-16 16.06-16 39T595.06-328q16.06 16 39 16ZM220-764h520q-24-26-92-41t-167-15q-118 0-181 13.5T220-764Zm82 502h356q35 0 58.5-27t23.5-62v-120H220v120q0 35 23.5 62t58.5 27Z"/></symbol>
+<symbol id="i-domain" viewBox="0 -960 960 960"><path d="M80-120v-720h390v165h410v555H80Zm60-60h105v-105H140v105Zm0-165h105v-105H140v105Zm0-165h105v-105H140v105Zm0-165h105v-105H140v105Zm165 495h105v-105H305v105Zm0-165h105v-105H305v105Zm0-165h105v-105H305v105Zm0-165h105v-105H305v105Zm165 495h350v-435H470v105h80v60h-80v105h80v60h-80v105Zm185-270v-60h60v60h-60Zm0 165v-60h60v60h-60Z"/></symbol>
+<symbol id="i-download" viewBox="0 -960 960 960"><path d="M480-313 287-506l43-43 120 120v-371h60v371l120-120 43 43-193 193ZM160-160v-203h60v143h520v-143h60v203H160Z"/></symbol>
+<symbol id="i-error" viewBox="0 -960 960 960"><path d="M479.98-280q14.02 0 23.52-9.48t9.5-23.5q0-14.02-9.48-23.52t-23.5-9.5q-14.02 0-23.52 9.48t-9.5 23.5q0 14.02 9.48 23.52t23.5 9.5ZM453-433h60v-253h-60v253Zm27.27 353q-82.74 0-155.5-31.5Q252-143 197.5-197.5t-86-127.34Q80-397.68 80-480.5t31.5-155.66Q143-709 197.5-763t127.34-85.5Q397.68-880 480.5-880t155.66 31.5Q709-817 763-763t85.5 127Q880-563 880-480.27q0 82.74-31.5 155.5Q817-252 763-197.68q-54 54.31-127 86Q563-80 480.27-80Zm.23-60Q622-140 721-239.5t99-241Q820-622 721.19-721T480-820q-141 0-240.5 98.81T140-480q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></symbol>
+<symbol id="i-event_available" viewBox="0 -960 960 960"><path d="M433-228 295-365l42-42 96 94 184-184 42 43-226 226ZM120-80v-740h125v-60h65v60h340v-60h65v60h125v740H120Zm60-60h600v-430H180v430Zm0-490h600v-130H180v130Zm0 0v-130 130Z"/></symbol>
+<symbol id="i-expand_more" viewBox="0 -960 960 960"><path d="M480-344 240-584l43-43 197 197 197-197 43 43-240 240Z"/></symbol>
+<symbol id="i-filter_list" viewBox="0 -960 960 960"><path d="M400-240v-60h160v60H400ZM240-450v-60h480v60H240ZM120-660v-60h720v60H120Z"/></symbol>
+<symbol id="i-group" viewBox="0 -960 960 960"><path d="M38-160v-94q0-35 18-63.5t50-42.5q73-32 131.5-46T358-420q62 0 120 14t131 46q32 14 50.5 42.5T678-254v94H38Zm700 0v-94q0-63-32-103.5T622-423q69 8 130 23.5t99 35.5q33 19 52 47t19 63v94H738ZM358-481q-66 0-108-42t-42-108q0-66 42-108t108-42q66 0 108 42t42 108q0 66-42 108t-108 42Zm360-150q0 66-42 108t-108 42q-11 0-24.5-1.5T519-488q24-25 36.5-61.5T568-631q0-45-12.5-79.5T519-774q11-3 24.5-5t24.5-2q66 0 108 42t42 108ZM98-220h520v-34q0-16-9.5-31T585-306q-72-32-121-43t-106-11q-57 0-106.5 11T130-306q-14 6-23 21t-9 31v34Zm260-321q39 0 64.5-25.5T448-631q0-39-25.5-64.5T358-721q-39 0-64.5 25.5T268-631q0 39 25.5 64.5T358-541Zm0 321Zm0-411Z"/></symbol>
+<symbol id="i-how_to_reg" viewBox="0 -960 960 960"><path d="M80-160v-94q0-34 17-62.5t51-43.5q72-32 132-46t120-14q29 0 61.5 3.5T528-404l-49 49q-20-2-39.5-3.5T400-360q-58 0-105.5 10.5T172-306q-17 8-24.5 23t-7.5 29v34h319l60 60H80Zm545 16L484-285l42-42 99 99 213-213 42 42-255 255ZM400-482q-66 0-108-42t-42-108q0-66 42-108t108-42q66 0 108 42t42 108q0 66-42 108t-108 42Zm59 262Zm-59-322q39 0 64.5-25.5T490-632q0-39-25.5-64.5T400-722q-39 0-64.5 25.5T310-632q0 39 25.5 64.5T400-542Zm0-90Z"/></symbol>
+<symbol id="i-info" viewBox="0 -960 960 960"><path d="M453-280h60v-240h-60v240Zm26.98-314q14.02 0 23.52-9.2T513-626q0-14.45-9.48-24.22-9.48-9.78-23.5-9.78t-23.52 9.78Q447-640.45 447-626q0 13.6 9.48 22.8 9.48 9.2 23.5 9.2Zm.29 514q-82.74 0-155.5-31.5Q252-143 197.5-197.5t-86-127.34Q80-397.68 80-480.5t31.5-155.66Q143-709 197.5-763t127.34-85.5Q397.68-880 480.5-880t155.66 31.5Q709-817 763-763t85.5 127Q880-563 880-480.27q0 82.74-31.5 155.5Q817-252 763-197.68q-54 54.31-127 86Q563-80 480.27-80Zm.23-60Q622-140 721-239.5t99-241Q820-622 721.19-721T480-820q-141 0-240.5 98.81T140-480q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></symbol>
+<symbol id="i-keyboard_double_arrow_left" viewBox="0 -960 960 960"><path d="M453-241 213-481l240-240 42 42-198 198 198 198-42 42Zm253 0L466-481l240-240 42 42-198 198 198 198-42 42Z"/></symbol>
+<symbol id="i-keyboard_double_arrow_right" viewBox="0 -960 960 960"><path d="M411-481 213-679l42-42 240 240-240 240-42-42 198-198Zm253 0L466-679l42-42 240 240-240 240-42-42 198-198Z"/></symbol>
+<symbol id="i-light_mode" viewBox="0 -960 960 960"><path d="M480-340q58 0 99-41t41-99q0-58-41-99t-99-41q-58 0-99 41t-41 99q0 58 41 99t99 41Zm0 60q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-450H40v-60h160v60Zm720 0H760v-60h160v60ZM450-760v-160h60v160h-60Zm0 720v-160h60v160h-60ZM262-658l-100-97 43-44 96 100-39 41Zm494 496-98-100 41-41 99 98-42 43Zm-99-537 98-99 44 42-99 98-43-41ZM162-205l99-98 42 42-98 99-43-43Zm318-275Z"/></symbol>
+<symbol id="i-logout" viewBox="0 -960 960 960"><path d="M120-120v-720h359v60H180v600h299v60H120Zm546-185-43-43 102-102H360v-60h363L621-612l43-43 176 176-174 174Z"/></symbol>
+<symbol id="i-menu_book" viewBox="0 -960 960 960"><path d="M248-300q53.57 0 104.28 12.5Q403-275 452-250v-427q-45-30-97.62-46.5Q301.76-740 248-740q-38 0-74.5 9.5T100-707v434q31-14 70.5-20.5T248-300Zm264 50q50-25 98-37.5T712-300q38 0 78.5 6t69.5 16v-429q-34-17-71.82-25-37.82-8-76.18-8-54 0-104.5 16.5T512-677v427Zm-30 90q-51-38-111-58.5T248-239q-52 0-112.5 20.5T40-176v-572q42-24 98.12-38 56.12-14 109.88-14 63 0 122.5 17T482-731q51-35 109.5-52T712-800q53.76 0 109.88 14.5T920-748v572q-34-23-95-43t-113-20q-63 0-121 21t-109 58ZM276-495Zm284-79v-48q33-14 67.5-21t72.5-7q26 0 51 4t49 10v44q-24-9-48.5-13.5T700-610q-38 0-73 9.5T560-574Zm0 220v-49q33-13.5 67.5-20.25T700-430q26 0 51 4t49 10v44q-24-9-48.5-13.5T700-390q-38 0-73 9t-67 27Zm0-110v-48q33-14 67.5-21t72.5-7q26 0 51 4t49 10v44q-24-9-48.5-13.5T700-500q-38 0-73 9.5T560-464Z"/></symbol>
+<symbol id="i-more_horiz" viewBox="0 -960 960 960"><path d="M207.86-432Q188-432 174-446.14t-14-34Q160-500 174.14-514t34-14Q228-528 242-513.86t14 34Q256-460 241.86-446t-34 14Zm272 0Q460-432 446-446.14t-14-34Q432-500 446.14-514t34-14Q500-528 514-513.86t14 34Q528-460 513.86-446t-34 14Zm272 0Q732-432 718-446.14t-14-34Q704-500 718.14-514t34-14Q772-528 786-513.86t14 34Q800-460 785.86-446t-34 14Z"/></symbol>
+<symbol id="i-notifications" viewBox="0 -960 960 960"><path d="M160-200v-60h80v-304q0-84 49.5-150.5T420-798v-82h120v82q81 17 130.5 83.5T720-564v304h80v60H160Zm320-302Zm0 422q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM300-260h360v-304q0-75-52.5-127.5T480-744q-75 0-127.5 52.5T300-564v304Z"/></symbol>
+<symbol id="i-payments" viewBox="0 -960 960 960"><path d="M540-420q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM160-280v-520h760v520H160Zm160-60h440q0-42 29-71t71-29v-200q-42 0-71-29t-29-71H320q0 42-29 71t-71 29v200q42 0 71 29t29 71ZM40-160v-520h60v460h700v60H40Zm180-180v-400 400Z"/></symbol>
+<symbol id="i-print" viewBox="0 -960 960 960"><path d="M658-648v-132H302v132h-60v-192h476v192h-60Zm-518 60h680-680Zm599 95q12 0 21-9t9-21q0-12-9-21t-21-9q-12 0-21 9t-9 21q0 12 9 21t21 9Zm-81 313v-192H302v192h356Zm60 60H242v-176H80v-352h800v352H718v176Zm102-236v-232H140v232h102v-76h476v76h102Z"/></symbol>
+<symbol id="i-quiz" viewBox="0 -960 960 960"><path d="M543-340q16.6 0 28.8-12.2T584-381q0-16.6-12.2-28.8T543-422q-16.6 0-28.8 12.2T502-381q0 16.6 12.2 28.8T543-340Zm-25-126h47q2-29 8.5-43t32.5-39q27-26 37.5-45.4Q654-612.79 654-639q0-45.88-31.5-74.94Q591-743 540-743q-38 0-68 20.5T428-665l45 19q11-25 27.5-38t39.5-13q29.78 0 48.39 17T607-637q0 20-9 35t-32 32q-32 29-40 46.5t-8 57.5ZM200-200v-680h680v680H200Zm60-60h560v-560H260v560ZM80-80v-680h60v620h620v60H80Zm180-740v560-560Z"/></symbol>
+<symbol id="i-school" viewBox="0 -960 960 960"><path d="M479-120 189-279v-240L40-600l439-240 441 240v317h-60v-282l-91 46v240L479-120Zm0-308 315-172-315-169-313 169 313 172Zm0 240 230-127v-168L479-360 249-485v170l230 127Zm1-240Zm-1 74Zm0 0Z"/></symbol>
+<symbol id="i-search" viewBox="0 -960 960 960"><path d="M796-121 533-384q-30 26-69.96 40.5Q423.08-329 378-329q-108.16 0-183.08-75Q120-479 120-585t75-181q75-75 181.5-75t181 75Q632-691 632-584.85 632-542 618-502q-14 40-42 75l264 262-44 44ZM377-389q81.25 0 138.13-57.5Q572-504 572-585t-56.87-138.5Q458.25-781 377-781q-82.08 0-139.54 57.5Q180-666 180-585t57.46 138.5Q294.92-389 377-389Z"/></symbol>
+<symbol id="i-settings" viewBox="0 -960 960 960"><path d="m388-80-20-126q-19-7-40-19t-37-25l-118 54-93-164 108-79q-2-9-2.5-20.5T185-480q0-9 .5-20.5T188-521L80-600l93-164 118 54q16-13 37-25t40-18l20-127h184l20 126q19 7 40.5 18.5T669-710l118-54 93 164-108 77q2 10 2.5 21.5t.5 21.5q0 10-.5 21t-2.5 21l108 78-93 164-118-54q-16 13-36.5 25.5T592-206L572-80H388Zm48-60h88l14-112q33-8 62.5-25t53.5-41l106 46 40-72-94-69q4-17 6.5-33.5T715-480q0-17-2-33.5t-7-33.5l94-69-40-72-106 46q-23-26-52-43.5T538-708l-14-112h-88l-14 112q-34 7-63.5 24T306-642l-106-46-40 72 94 69q-4 17-6.5 33.5T245-480q0 17 2.5 33.5T254-413l-94 69 40 72 106-46q24 24 53.5 41t62.5 25l14 112Zm44-210q54 0 92-38t38-92q0-54-38-92t-92-38q-54 0-92 38t-38 92q0 54 38 92t92 38Zm0-130Z"/></symbol>
+<symbol id="i-unfold_more" viewBox="0 -960 960 960"><path d="M480-120 300-300l44-44 136 136 136-136 44 44-180 180ZM344-612l-44-44 180-180 180 180-44 44-136-136-136 136Z"/></symbol>
+<symbol id="i-warning" viewBox="0 -960 960 960"><path d="m40-120 440-760 440 760H40Zm104-60h672L480-760 144-180Zm340.18-57q12.82 0 21.32-8.68 8.5-8.67 8.5-21.5 0-12.82-8.68-21.32-8.67-8.5-21.5-8.5-12.82 0-21.32 8.68-8.5 8.67-8.5 21.5 0 12.82 8.68 21.32 8.67 8.5 21.5 8.5ZM454-348h60v-224h-60v224Zm26-122Z"/></symbol>
+</defs></svg>
+
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="bar-brand" href="#top"><svg class="mark" width="24" height="24" aria-hidden="true"><use href="#mark"/></svg><b>Kashi</b><span>school theme</span></a>
+    <nav class="bar-nav" aria-label="Sections">
+      <a href="#preview">Screen</a><a href="#brand">Brand</a><a href="#colour">Colour</a><a href="#type">Type</a><a href="#components">Components</a><a href="#rules">Layout rules</a>
+    </nav>
+    <div class="bar-ctl">
+      <div class="seg" role="group" aria-label="Colour palette" id="palette-ctl">
+        <button type="button" data-palette="kashi" aria-pressed="true"><i class="chip chip-kashi"></i>Kashi</button>
+        <button type="button" data-palette="sabz" aria-pressed="false"><i class="chip chip-sabz"></i>Sabz</button>
+        <button type="button" data-palette="siyahi" aria-pressed="false"><i class="chip chip-siyahi"></i>Siyahi</button>
+      </div>
+      <div class="seg" role="group" aria-label="Light or dark" id="mode-ctl">
+        <button type="button" data-mode="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-mode="light" aria-pressed="false"><svg class="i i-sm" aria-hidden="true"><use href="#i-light_mode"/></svg>Light</button>
+        <button type="button" data-mode="dark" aria-pressed="false"><svg class="i i-sm" aria-hidden="true"><use href="#i-dark_mode"/></svg>Dark</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap intro" id="top">
+    <p class="label">Theme proposal for Grades 1 to 10 school software</p>
+    <h1>Square corners, clear <mark>colour</mark>.</h1>
+    <p class="lede"><span class="kashi-only">Cobalt, turquoise and white are the three glazes of Multan&rsquo;s kashi tile work. Kashi sets them on a ruled page with sharp corners and one-pixel lines.</span> Colour is kept for two jobs only, the action you can take and the status of a record, so a fee table reads at a glance in light and in dark.</p>
+    <ul class="facts">
+      <li><b>0</b>corner radius, everywhere</li>
+      <li><b>1px</b>lines instead of shadows</li>
+      <li><b>4px</b>spacing grid</li>
+      <li><b>AA</b>contrast in both modes</li>
+    </ul>
+  </section>
+
+  <section class="wrap section" id="preview">
+    <div class="section-head">
+      <p class="label">Screen</p>
+      <h2>Fee vouchers</h2>
+      <p>The layout of your two references with school data in it. Switch palette and mode in the bar above.</p>
+    </div>
+    <div class="mock" tabindex="0" role="group" aria-label="Fee vouchers screen preview">
+      <div class="app">
+        <aside class="side on-dark">
+          <div class="side-brand"><svg class="mark" width="22" height="22" aria-hidden="true"><use href="#mark"/></svg><span class="wordmark" data-brand>Takhti</span></div>
+          <button class="side-branch" type="button"><span class="avatar sm">MC</span><span class="t"><b>Main Campus</b><small>Lahore &middot; Principal</small></span><svg class="i i-sm" aria-hidden="true"><use href="#i-unfold_more"/></svg></button>
+          <p class="nav-label">School</p>
+          <nav class="nav" aria-label="School">
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-dashboard"/></svg>Dashboard</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-group"/></svg>Students</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-how_to_reg"/></svg>Admissions</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-event_available"/></svg>Attendance</a>
+            <a href="#preview" aria-current="page"><svg class="i" aria-hidden="true"><use href="#i-payments"/></svg>Fees<span class="nav-count">87</span></a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-quiz"/></svg>Exams</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-calendar_month"/></svg>Timetable</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-badge"/></svg>Staff</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-directions_bus"/></svg>Transport</a>
+          </nav>
+          <p class="nav-label">Head office</p>
+          <nav class="nav" aria-label="Head office">
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-domain"/></svg>Branches</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-bar_chart"/></svg>Reports</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-settings"/></svg>Settings</a>
+          </nav>
+          <div class="side-foot nav">
+            <a href="#preview"><span class="avatar sm">SA</span>Sana Ahmed</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-logout"/></svg>Sign out</a>
+          </div>
+        </aside>
+
+        <div class="main">
+          <div class="top">
+            <div class="crumbs"><span>Fees</span><svg class="i i-sm" aria-hidden="true"><use href="#i-chevron_right"/></svg><b>Vouchers</b></div>
+            <label class="search"><svg class="i i-sm" aria-hidden="true"><use href="#i-search"/></svg><input class="input" id="mock-global-search" placeholder="Search students, vouchers" aria-label="Search students and vouchers"></label>
+            <button class="btn btn-ghost btn-icon" type="button" aria-label="Notifications"><svg class="i" aria-hidden="true"><use href="#i-notifications"/></svg></button>
+            <span class="avatar">SA</span>
+          </div>
+          <div class="content">
+            <div class="page-head">
+              <div>
+                <h3>Fee vouchers</h3>
+                <p>October 2026 &middot; issued 1 Oct, due 10 Oct &middot; Main Campus</p>
+              </div>
+              <div class="row">
+                <button class="btn btn-outline" type="button"><svg class="i" aria-hidden="true"><use href="#i-print"/></svg>Print challans</button>
+                <button class="btn btn-primary" type="button"><svg class="i" aria-hidden="true"><use href="#i-add"/></svg>Collect fee</button>
+              </div>
+            </div>
+
+            <div class="kpis">
+              <div class="kpi"><span class="label">Billed this month</span><span class="value"><small>Rs</small>9.84M</span><span class="sub">1,248 vouchers</span></div>
+              <div class="kpi"><span class="label">Collected</span><span class="value"><small>Rs</small>7.41M</span><div class="meter" role="img" aria-label="75 percent of billed amount collected"><i style="width:75%"></i></div><span class="sub">75% of billed</span></div>
+              <div class="kpi"><span class="label">Outstanding</span><span class="value"><small>Rs</small>2.43M</span><span class="sub">336 vouchers open</span></div>
+              <div class="kpi"><span class="label">Overdue</span><span class="value">87</span><span class="sub bad"><svg class="i" aria-hidden="true"><use href="#i-arrow_upward"/></svg>12 more than September</span></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-row">
+                <div class="seg" role="group" aria-label="Voucher status" data-toggle>
+                  <button type="button" aria-pressed="true">All <span class="count">1,248</span></button>
+                  <button type="button" aria-pressed="false">Paid <span class="count">912</span></button>
+                  <button type="button" aria-pressed="false">Partial <span class="count">96</span></button>
+                  <button type="button" aria-pressed="false">Unpaid <span class="count">153</span></button>
+                  <button type="button" aria-pressed="false">Overdue <span class="count">87</span></button>
+                </div>
+                <span class="spacer"></span>
+                <button class="btn btn-outline btn-sm" type="button"><svg class="i i-sm" aria-hidden="true"><use href="#i-download"/></svg>Export</button>
+              </div>
+              <div class="panel-row">
+                <label class="search"><svg class="i i-sm" aria-hidden="true"><use href="#i-search"/></svg><input class="input" id="mock-table-search" placeholder="Name, admission or voucher no." aria-label="Search vouchers"></label>
+                <label class="select-wrap"><select class="select" id="mock-class" aria-label="Class"><option>All classes</option><option>Grade 1</option><option>Grade 5</option><option>Grade 8</option><option>Grade 10</option></select><svg class="i" aria-hidden="true"><use href="#i-expand_more"/></svg></label>
+                <button class="btn btn-outline" type="button"><svg class="i" aria-hidden="true"><use href="#i-filter_list"/></svg>Filters</button>
+                <span class="spacer"></span>
+                <span class="muted" style="font-size:12.5px">1 selected</span>
+                <button class="btn btn-outline btn-sm" type="button">Send reminder</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data">
+                  <thead>
+                    <tr>
+                      <th style="width:36px"><input class="check" type="checkbox" id="mock-all" aria-label="Select all"></th>
+                      <th>Voucher</th><th>Student</th><th>Class</th>
+                      <th class="r">Billed (Rs)</th><th class="r">Paid (Rs)</th><th class="r">Balance (Rs)</th>
+                      <th>Due</th><th>Status</th><th style="width:44px"><span class="sr">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody id="voucher-rows"></tbody>
+                </table>
+              </div>
+              <div class="panel-foot">
+                <span>Showing <b class="num">1 to 8</b> of <b class="num">1,248</b></span>
+                <span class="spacer" style="margin-right:auto"></span>
+                <span>Rows</span>
+                <label class="select-wrap"><select class="select" id="mock-rows" aria-label="Rows per page"><option>8</option><option>25</option><option>50</option></select><svg class="i i-sm" aria-hidden="true"><use href="#i-expand_more"/></svg></label>
+                <span class="num">Page 1 of 156</span>
+                <span class="pager">
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="First page" disabled><svg class="i i-sm" aria-hidden="true"><use href="#i-keyboard_double_arrow_left"/></svg></button>
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="Previous page" disabled><svg class="i i-sm" aria-hidden="true"><use href="#i-chevron_left"/></svg></button>
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="Next page"><svg class="i i-sm" aria-hidden="true"><use href="#i-chevron_right"/></svg></button>
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="Last page"><svg class="i i-sm" aria-hidden="true"><use href="#i-keyboard_double_arrow_right"/></svg></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="brand">
+    <div class="section-head">
+      <p class="label">Brand</p>
+      <h2>Logo</h2>
+      <p>An open book with one coloured page and a spark above the spine. It is drawn from straight lines only, so it matches the square corners of the product. The name is a working name; type yours to try it.</p>
+    </div>
+    <div class="row">
+      <div class="field" style="width:min(100%,260px)">
+        <label class="label" for="brand-name">Working name</label>
+        <input class="input" id="brand-name" value="Takhti" maxlength="18" autocomplete="off">
+      </div>
+      <p class="muted" style="max-width:52ch;font-size:12.5px">A takhti is the wooden slate children in Pakistan learn to write on. Other candidates: Darsgah, Nisaab, Rehbar.</p>
+    </div>
+    <div class="brand-tiles">
+      <div class="brand-tile paper">
+        <div class="lockup"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark"/></svg><div><span class="wordmark" data-brand>Takhti</span><small>School OS</small></div></div>
+        <span class="label">On paper</span>
+      </div>
+      <div class="brand-tile ink on-dark">
+        <div class="lockup"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark"/></svg><div><span class="wordmark" data-brand>Takhti</span><small>School OS</small></div></div>
+        <span class="label">On ink</span>
+      </div>
+      <div class="brand-tile solid">
+        <div class="lockup"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark-bare"/></svg><div><span class="wordmark" data-brand>Takhti</span><small>School OS</small></div></div>
+        <span class="label">One colour</span>
+      </div>
+      <div class="brand-tile paper">
+        <div class="lockup" dir="rtl" lang="ur"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark"/></svg><span class="lockup-ur">تختی</span></div>
+        <span class="label">Urdu, for the working name</span>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="card-head"><h3>Sizes</h3><span class="muted" style="font-size:12px">Readable down to a 16px favicon</span></div>
+        <div class="card-body">
+          <div class="sizes">
+            <figure><svg class="mark" width="72" height="72" aria-hidden="true"><use href="#mark"/></svg>72</figure>
+            <figure><svg class="mark" width="40" height="40" aria-hidden="true"><use href="#mark"/></svg>40</figure>
+            <figure><svg class="mark" width="24" height="24" aria-hidden="true"><use href="#mark"/></svg>24</figure>
+            <figure><svg class="mark" width="16" height="16" aria-hidden="true"><use href="#mark"/></svg>16</figure>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>How the colours are used</h3></div>
+        <div class="roles" style="border:0">
+          <div class="role"><i style="background:var(--primary)"></i><div><b>Primary</b><span class="kashi-only ur" lang="ur" dir="rtl">لاجورد</span><span>Buttons, links, table header</span></div></div>
+          <div class="role"><i style="background:var(--brand)"></i><div><b>Highlight</b><span class="kashi-only ur" lang="ur" dir="rtl">فیروزہ</span><span>Active marker, avatars</span></div></div>
+          <div class="role"><i style="background:var(--spark)"></i><div><b>Spark</b><span class="kashi-only ur" lang="ur" dir="rtl">گیندا</span><span>Logo and marketing only</span></div></div>
+          <div class="role"><i style="background:var(--sidebar)"></i><div><b>Ink</b><span class="kashi-only ur" lang="ur" dir="rtl">سیاہی</span><span>Sidebar, toasts</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="colour">
+    <div class="section-head">
+      <p class="label">Colour</p>
+      <h2>Tokens</h2>
+      <p>Every value below is live for the palette and mode you have selected. Text pairs meet WCAG AA, and the chart colours are checked for colour-blind separation.</p>
+    </div>
+    <div id="swatch-groups" class="grid"></div>
+
+    <div class="section-head group-title">
+      <h2 style="font-size:17px">Status in school terms</h2>
+      <p>Status colours never change with the brand palette, and a status always carries its word.</p>
+    </div>
+    <div class="states">
+      <div class="card">
+        <div class="card-head"><h3>Fees</h3></div>
+        <ul class="state-list">
+          <li><span>Paid in full</span><span class="badge success">Paid</span></li>
+          <li><span>Part of the voucher paid</span><span class="badge warning">Partial</span></li>
+          <li><span>Not yet due</span><span class="badge">Unpaid</span></li>
+          <li><span>Past the due date</span><span class="badge danger">Overdue</span></li>
+          <li><span>Paid ahead</span><span class="badge info">Advance</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Attendance</h3></div>
+        <ul class="state-list">
+          <li><span>In class</span><span class="badge success">Present</span></li>
+          <li><span>Arrived after the bell</span><span class="badge warning">Late</span></li>
+          <li><span>Not in school</span><span class="badge danger">Absent</span></li>
+          <li><span>Approved leave</span><span class="badge info">Leave</span></li>
+          <li><span>Not marked yet</span><span class="badge">Pending</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Results</h3></div>
+        <ul class="state-list">
+          <li><span>40% or above in every subject</span><span class="badge success">Pass</span></li>
+          <li><span>Below 40% in a subject</span><span class="badge danger">Fail</span></li>
+          <li><span>Marks entered, not published</span><span class="badge warning">Under review</span></li>
+          <li><span>Visible to parents</span><span class="badge info">Published</span></li>
+          <li><span>Exam not held yet</span><span class="badge">Scheduled</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="type">
+    <div class="section-head">
+      <p class="label">Type</p>
+      <h2>Four typefaces, one job each</h2>
+      <p>Round letters in the headings soften the square layout. The text face is built for dense tables, and codes get a face where 0 and O, 1 and l can never be confused.</p>
+    </div>
+    <div class="card specimen">
+      <div><div class="what"><b>Display</b><span>Lexend 500</span></div><p class="t-display">Admissions open for 2027</p></div>
+      <div><div class="what"><b>Page title</b><span>Lexend 500, 20px</span></div><p class="t-title">Fee vouchers</p></div>
+      <div><div class="what"><b>Body</b><span>IBM Plex Sans, 14px</span></div><p class="t-body">Vouchers are issued on the 1st and fall due on the 10th. A late fine of Rs 500 is added after the due date, and arrears carry forward to next month.</p></div>
+      <div><div class="what"><b>Interface</b><span>IBM Plex Sans, 13px</span></div><p class="t-ui">Ayesha Imran &middot; Grade 8-B &middot; 1,248 vouchers &middot; Page 1 of 156</p></div>
+      <div><div class="what"><b>Label</b><span>11px, capitals, spaced</span></div><p class="label">Billed this month</p></div>
+      <div><div class="what"><b>Codes</b><span>IBM Plex Mono</span></div><p class="code" style="font-size:13px">FV-2610-0412 &nbsp; 35202-1234567-1 &nbsp; ADM-0O1lI</p></div>
+      <div><div class="what"><b>Urdu</b><span>Noto Nastaliq Urdu</span></div><p class="t-urdu" lang="ur" dir="rtl">علم روشنی ہے &nbsp;·&nbsp; فیس واؤچر &nbsp;·&nbsp; طلبہ کی حاضری &nbsp;·&nbsp; رپورٹ کارڈ</p></div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="components">
+    <div class="section-head">
+      <p class="label">Components</p>
+      <h2>Building blocks</h2>
+      <p>The same pieces the real screens will use. They are live: hover, focus with Tab, tick and switch them.</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="card-head"><h3>Buttons</h3></div>
+        <div class="card-body">
+          <div class="row">
+            <button class="btn btn-primary" type="button">Collect fee</button>
+            <button class="btn btn-outline" type="button">Print challan</button>
+            <button class="btn btn-ghost" type="button">Cancel</button>
+            <button class="btn btn-danger" type="button">Delete voucher</button>
+            <button class="btn btn-primary" type="button" disabled>Disabled</button>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary btn-sm" type="button">Small 28</button>
+            <button class="btn btn-primary" type="button">Default 32</button>
+            <button class="btn btn-primary btn-lg" type="button">Large 40</button>
+            <button class="btn btn-outline btn-icon" type="button" aria-label="More actions"><svg class="i" aria-hidden="true"><use href="#i-more_horiz"/></svg></button>
+            <button class="btn btn-outline" type="button"><svg class="i" aria-hidden="true"><use href="#i-download"/></svg>Export</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Choices</h3></div>
+        <div class="card-body">
+          <div class="row" style="gap:18px">
+            <label class="choice"><input class="check" type="checkbox" id="c-sms" checked>SMS to parents</label>
+            <label class="choice"><input class="check" type="checkbox" id="c-wa">WhatsApp</label>
+            <label class="choice"><input class="switch" type="checkbox" id="c-fine" checked>Late fine</label>
+          </div>
+          <div class="row" style="gap:18px">
+            <label class="choice"><input class="radio" type="radio" name="medium" id="r-en" checked>English medium</label>
+            <label class="choice"><input class="radio" type="radio" name="medium" id="r-ur">Urdu medium</label>
+          </div>
+          <div class="row">
+            <span class="avatar">AK</span><span class="avatar" style="background:var(--primary);color:var(--primary-foreground)">MH</span><span class="avatar" style="background:var(--muted);color:var(--foreground)">+4</span>
+            <span class="tip">Collected by Sana Ahmed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Tabs and messages</h3></div>
+        <div class="card-body">
+          <div class="tabs" role="tablist" aria-label="Student record" data-tabs>
+            <button class="tab" role="tab" type="button" aria-selected="true">Profile</button>
+            <button class="tab" role="tab" type="button" aria-selected="false">Attendance</button>
+            <button class="tab" role="tab" type="button" aria-selected="false">Fees</button>
+            <button class="tab" role="tab" type="button" aria-selected="false">Results</button>
+          </div>
+          <div class="note success"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg><div><b>Payment recorded</b><p>Rs 8,500 received in cash. Receipt R-2610-0931 is ready to print.</p></div></div>
+          <div class="note warning"><svg class="i" aria-hidden="true"><use href="#i-warning"/></svg><div><b>You are offline</b><p>3 attendance records are saved on this device and will sync when the internet returns.</p></div></div>
+          <div class="note danger"><svg class="i" aria-hidden="true"><use href="#i-error"/></svg><div><b>Voucher was changed by someone else</b><p>Reload the page to see the latest amount, then try again.</p></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Dialog</h3></div>
+        <div class="card-body">
+          <div class="dialog" role="group" aria-label="Collect fee dialog example">
+            <header><h4>Collect fee</h4><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Close"><svg class="i i-sm" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+            <div class="body">
+              <p class="t-ui">Muhammad Hamza, Grade 10-A. Balance <b class="num">Rs 4,800</b> on voucher <span class="code">FV-2610-0413</span>.</p>
+              <div class="form-grid">
+                <div class="field"><label class="label" for="d-amount">Amount received (Rs)</label><input class="input num" id="d-amount" value="4,800" inputmode="numeric"></div>
+                <div class="field"><label class="label" for="d-method">Method</label><label class="select-wrap"><select class="select" id="d-method"><option>Cash</option><option>JazzCash</option><option>Easypaisa</option><option>Bank challan</option></select><svg class="i" aria-hidden="true"><use href="#i-expand_more"/></svg></label></div>
+              </div>
+            </div>
+            <footer><button class="btn btn-outline" type="button">Cancel</button><button class="btn btn-primary" type="button">Record Rs 4,800</button></footer>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Form</h3></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field"><label class="label" for="f-name">Student name</label><input class="input" id="f-name" value="Ayesha Imran"></div>
+            <div class="field"><label class="label" for="f-class">Class</label><label class="select-wrap"><select class="select" id="f-class"><option>Grade 8-B</option><option>Grade 8-A</option></select><svg class="i" aria-hidden="true"><use href="#i-expand_more"/></svg></label></div>
+            <div class="field"><label class="label" for="f-bform">B-Form number</label><input class="input code" id="f-bform" value="35202-12345" aria-invalid="true" aria-describedby="f-bform-hint"><span class="hint error" id="f-bform-hint">Use the format 12345-1234567-1</span></div>
+            <div class="field"><label class="label" for="f-dob">Date of birth</label><input class="input" id="f-dob" type="date" value="2013-03-14"><span class="hint">As written on the B-Form</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Things that float</h3><span class="muted" style="font-size:12px">The only place a shadow is used</span></div>
+        <div class="card-body">
+          <div class="row" style="align-items:flex-start;gap:16px">
+            <div class="menu" role="menu" aria-label="Voucher actions">
+              <button type="button" role="menuitem" class="hover"><svg class="i i-sm" aria-hidden="true"><use href="#i-payments"/></svg>Collect fee<kbd>C</kbd></button>
+              <button type="button" role="menuitem"><svg class="i i-sm" aria-hidden="true"><use href="#i-print"/></svg>Print challan<kbd>P</kbd></button>
+              <button type="button" role="menuitem"><svg class="i i-sm" aria-hidden="true"><use href="#i-notifications"/></svg>Send reminder</button>
+              <hr>
+              <button type="button" role="menuitem" class="danger"><svg class="i i-sm" aria-hidden="true"><use href="#i-close"/></svg>Cancel voucher</button>
+            </div>
+            <div class="toast" role="status"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Reminder sent to 87 parents<button class="btn btn-ghost btn-sm" type="button">Undo</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Fee collected, last 6 months</h3><span class="muted" style="font-size:12px">Rs million, Main Campus</span></div>
+        <div class="card-body"><div class="chart" id="chart-fees"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Attendance, last 14 school days</h3><span class="muted" style="font-size:12px">Percent present</span></div>
+        <div class="card-body">
+          <div class="legend"><span><i style="background:var(--chart-1)"></i>Grades 1 to 5</span><span><i style="background:var(--chart-2)"></i>Grades 6 to 10</span></div>
+          <div class="chart" id="chart-attendance"></div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-head"><h3>October vouchers by status</h3><span class="muted num" style="font-size:12px">1,248 vouchers</span></div>
+        <div class="card-body">
+          <div class="stack" role="img" aria-label="912 paid, 96 partial, 153 unpaid, 87 overdue">
+            <i style="flex:912;background:var(--success)"></i><i style="flex:96;background:var(--warning)"></i><i style="flex:153;background:var(--input)"></i><i style="flex:87;background:var(--danger)"></i>
+          </div>
+          <div class="row" style="gap:10px 18px">
+            <span class="badge success">Paid <b class="num">912</b></span>
+            <span class="badge warning">Partial <b class="num">96</b></span>
+            <span class="badge">Unpaid <b class="num">153</b></span>
+            <span class="badge danger">Overdue <b class="num">87</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="rules">
+    <div class="section-head">
+      <p class="label">Layout rules</p>
+      <h2>What every screen follows</h2>
+      <p>Taken from your two references: hairline borders, capital micro-labels, compact toolbars, a filled table header and tinted badges. Corners are square on everything.</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <table class="rules">
+          <tr><th>Corners</th><td>0 on buttons, inputs, cards, badges, avatars, switches and chart bars</td></tr>
+          <tr><th>Lines</th><td>1px. Structure comes from lines, never from shadows</td></tr>
+          <tr><th>Shadows</th><td>Only on menus, dialogs and toasts</td></tr>
+          <tr><th>Controls</th><td>28, 32 or 40px high. 32 is the default</td></tr>
+          <tr><th>Tables</th><td>36px header, 40px rows (32 compact, 48 comfortable), 12px cell padding, numbers right-aligned</td></tr>
+          <tr><th>Sidebar</th><td>208px wide, 32px items, 56px when collapsed</td></tr>
+          <tr><th>Page</th><td>20px padding, 16px between blocks, cards padded 16px</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <table class="rules">
+          <tr><th>Labels</th><td>11px, capitals, letter-spaced, above the field</td></tr>
+          <tr><th>Focus</th><td>2px ring with a 2px gap, on every control</td></tr>
+          <tr><th>Icons</th><td>Material Symbols Sharp, 18px, the square-cornered set used on this page</td></tr>
+          <tr><th>Radio</th><td>A diamond, so it never looks like a checkbox</td></tr>
+          <tr><th>Codes</th><td>Admission, roll, B-Form and voucher numbers in the mono face</td></tr>
+          <tr><th>Urdu</th><td>Nastaliq, set larger with a line height of 2.1, right to left</td></tr>
+          <tr><th>Dates</th><td>10 Oct 2026 in tables, never 10/10/26</td></tr>
+        </table>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-head"><h3>Spacing scale</h3><span class="muted" style="font-size:12px">Every gap and padding is one of these</span></div>
+        <div class="card-body">
+          <div class="scale">
+            <figure><i style="width:4px"></i>4</figure><figure><i style="width:8px"></i>8</figure><figure><i style="width:12px"></i>12</figure><figure><i style="width:16px"></i>16</figure><figure><i style="width:20px"></i>20</figure><figure><i style="width:24px"></i>24</figure><figure><i style="width:32px"></i>32</figure><figure><i style="width:40px"></i>40</figure><figure><i style="width:48px"></i>48</figure>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="foot">Sample data throughout. The product name and logo are proposals until you confirm them.</p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const body = document.body;
+  const store = {
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch { /* storage is optional */ } },
+  };
+
+  // ----- palette and mode ---------------------------------------------------------------------------
+  const darkQuery = matchMedia('(prefers-color-scheme: dark)');
+  const viewerMode = () => root.dataset.theme || (darkQuery.matches ? 'dark' : 'light');
+  let mode = ['light', 'dark'].includes(store.get('kashi-mode')) ? store.get('kashi-mode') : 'auto';
+  let palette = ['kashi', 'sabz', 'siyahi'].includes(store.get('kashi-palette')) ? store.get('kashi-palette') : 'kashi';
+
+  function press(group, attribute, value) {
+    for (const button of group.querySelectorAll('button')) {
+      button.setAttribute('aria-pressed', String(button.dataset[attribute] === value));
+    }
+  }
+
+  function applyTheme() {
+    const effective = mode === 'auto' ? viewerMode() : mode;
+    body.dataset.mode = effective;
+    body.dataset.palette = palette;
+    root.style.colorScheme = effective;
+    press(document.getElementById('mode-ctl'), 'mode', mode);
+    press(document.getElementById('palette-ctl'), 'palette', palette);
+    renderSwatches();
+    renderCharts();
+  }
+
+  document.getElementById('mode-ctl').addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-mode]');
+    if (!button) return;
+    mode = button.dataset.mode;
+    store.set('kashi-mode', mode);
+    applyTheme();
+  });
+  document.getElementById('palette-ctl').addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-palette]');
+    if (!button) return;
+    palette = button.dataset.palette;
+    store.set('kashi-palette', palette);
+    applyTheme();
+  });
+  darkQuery.addEventListener('change', applyTheme);
+  new MutationObserver(applyTheme).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // ----- small demo behaviours ------------------------------------------------------------------------
+  for (const group of document.querySelectorAll('[data-toggle]')) {
+    group.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      for (const other of group.querySelectorAll('button')) other.setAttribute('aria-pressed', String(other === button));
+    });
+  }
+  for (const list of document.querySelectorAll('[data-tabs]')) {
+    list.addEventListener('click', (event) => {
+      const tab = event.target.closest('.tab');
+      if (!tab) return;
+      for (const other of list.querySelectorAll('.tab')) other.setAttribute('aria-selected', String(other === tab));
+    });
+  }
+  const nameInput = document.getElementById('brand-name');
+  const setName = () => {
+    const name = nameInput.value.trim() || 'Takhti';
+    for (const node of document.querySelectorAll('[data-brand]')) node.textContent = name;
+  };
+  nameInput.addEventListener('input', setName);
+  setName();
+
+  // ----- voucher rows (sample data) --------------------------------------------------------------------
+  const vouchers = [
+    ['FV-2610-0412', 'Ayesha Imran', 'd/o Imran Khan', '8-B', 8500, 8500, '10 Oct', 'Paid', 'success'],
+    ['FV-2610-0413', 'Muhammad Hamza', 's/o Tariq Mehmood', '10-A', 9800, 5000, '10 Oct', 'Partial', 'warning'],
+    ['FV-2610-0414', 'Fatima Noor', 'd/o Noor Ahmed', '3-A', 6200, 0, '10 Oct', 'Unpaid', ''],
+    ['FV-2610-0415', 'Ali Raza', 's/o Raza Hussain', '9-C', 10300, 0, '10 Oct', 'Overdue', 'danger'],
+    ['FV-2610-0416', 'Zainab Ahmed', 'd/o Ahmed Ali', '5-B', 6800, 6800, '10 Oct', 'Paid', 'success'],
+    ['FV-2610-0417', 'Hassan Javed', 's/o Javed Iqbal', '7-A', 8400, 0, '10 Oct', 'Overdue', 'danger'],
+    ['FV-2610-0418', 'Maryam Siddiqui', 'd/o Asif Siddiqui', '1-A', 5500, 11000, '10 Oct', 'Advance', 'info'],
+    ['FV-2610-0419', 'Usman Tariq', 's/o Tariq Aziz', '6-C', 7400, 7400, '10 Oct', 'Paid', 'success'],
+  ];
+  const money = (value) => value.toLocaleString('en-PK');
+  document.getElementById('voucher-rows').innerHTML = vouchers
+    .map(([no, name, parent, klass, billed, paid, due, status, tone], index) => {
+      const balance = Math.max(0, billed - paid);
+      const late = status === 'Overdue';
+      return `<tr${index === 1 ? ' aria-selected="true"' : ''}>
+        <td><input class="check" type="checkbox" id="row-${index}" aria-label="Select ${name}"${index === 1 ? ' checked' : ''}></td>
+        <td class="code">${no}</td>
+        <td><span class="who"><span>${name}</span><small>${parent}</small></span></td>
+        <td>${klass}</td>
+        <td class="r num">${money(billed)}</td>
+        <td class="r num">${money(paid)}</td>
+        <td class="r num"${late ? ' style="font-weight:600"' : ''}>${money(balance)}</td>
+        <td${late ? ' class="late"' : ''}>${due}${late ? ' &middot; 4 days late' : ''}</td>
+        <td><span class="badge ${tone}">${status}</span></td>
+        <td><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Actions for ${name}"><svg class="i i-sm" aria-hidden="true"><use href="#i-more_horiz"/></svg></button></td>
+      </tr>`;
+    })
+    .join('');
+
+  // ----- colour swatches ----------------------------------------------------------------------------------
+  const token = (name) => getComputedStyle(body).getPropertyValue(`--${name}`).trim();
+  function luminance(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+      const c = v / 255;
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+  function ratio(a, b) {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return ((hi + 0.05) / (lo + 0.05)).toFixed(1);
+  }
+  // [token, what it is checked against, shown as "text on X"]
+  const groups = [
+    ['Surfaces and lines', [['background'], ['card'], ['muted'], ['accent'], ['border'], ['input', 'card']]],
+    ['Text', [['foreground', 'card'], ['muted-foreground', 'card'], ['link', 'card'], ['brand-text', 'card']]],
+    ['Brand', [['primary', 'primary-foreground'], ['primary-hover', 'primary-foreground'], ['brand', 'brand-foreground'], ['spark'], ['ring', 'card']]],
+    ['Sidebar and table', [['sidebar', 'sidebar-foreground'], ['sidebar-accent', 'sidebar-accent-foreground'], ['sidebar-border'], ['table-header', 'table-header-foreground'], ['row-hover']]],
+    ['Status', [['success', 'success-subtle'], ['warning', 'warning-subtle'], ['danger', 'danger-subtle'], ['info', 'info-subtle'], ['destructive', 'destructive-foreground']]],
+    ['Charts', [['chart-1'], ['chart-2'], ['chart-3'], ['chart-4'], ['chart-5']]],
+  ];
+  function renderSwatches() {
+    document.getElementById('swatch-groups').innerHTML = groups
+      .map(([title, tokens]) => `<div class="grid" style="gap:8px"><p class="label">${title}</p><div class="swatches">${tokens
+        .map(([name, against]) => {
+          const value = token(name);
+          const pair = against ? `${ratio(value, token(against))}:1 with ${against}` : '&nbsp;';
+          return `<div class="swatch"><i style="background:var(--${name})"></i><div><b>${name}</b><span>${value}</span><span>${pair}</span></div></div>`;
+        })
+        .join('')}</div></div>`)
+      .join('');
+  }
+
+  // ----- charts --------------------------------------------------------------------------------------------
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const el = (name, attrs = {}, text) => {
+    const node = document.createElementNS(svgNS, name);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  function tooltipFor(container) {
+    const tip = document.createElement('div');
+    tip.className = 'tooltip';
+    tip.hidden = true;
+    container.append(tip);
+    return {
+      show(html, x, y) {
+        tip.innerHTML = html;
+        tip.hidden = false;
+        const box = container.getBoundingClientRect();
+        const left = Math.min(Math.max(0, x - tip.offsetWidth / 2), box.width - tip.offsetWidth);
+        tip.style.left = `${left}px`;
+        tip.style.top = `${Math.max(0, y - tip.offsetHeight - 10)}px`;
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+
+  function feesChart() {
+    const container = document.getElementById('chart-fees');
+    container.replaceChildren();
+    const data = [['May', 8.9], ['Jun', 6.1], ['Jul', 5.4], ['Aug', 9.2], ['Sep', 9.5], ['Oct', 7.4]];
+    const W = 520, H = 230, left = 30, right = 8, top = 18, bottom = 26;
+    const plotW = W - left - right, plotH = H - top - bottom, max = 10;
+    const y = (value) => top + plotH - (value / max) * plotH;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Fee collected per month in millions of rupees: ' + data.map(([m, v]) => `${m} ${v}`).join(', ') });
+    for (const tick of [0, 2.5, 5, 7.5, 10]) {
+      svg.append(el('line', { class: 'grid', x1: left, x2: W - right, y1: y(tick), y2: y(tick) }));
+      svg.append(el('text', { x: left - 6, y: y(tick) + 4, 'text-anchor': 'end' }, String(tick)));
+    }
+    const tip = tooltipFor(container);
+    const band = plotW / data.length;
+    data.forEach(([month, value], index) => {
+      const cx = left + band * index + band / 2;
+      const bar = el('rect', { x: cx - 12, y: y(value), width: 24, height: y(0) - y(value), fill: 'var(--chart-1)' });
+      svg.append(bar);
+      svg.append(el('text', { class: 'val', x: cx, y: y(value) - 6, 'text-anchor': 'middle' }, value.toFixed(1)));
+      svg.append(el('text', { x: cx, y: H - 8, 'text-anchor': 'middle' }, month));
+      const hit = el('rect', { class: 'hit', x: left + band * index, y: top, width: band, height: plotH, tabindex: 0, 'aria-label': `${month} 2026, Rs ${value.toFixed(1)} million collected` });
+      const show = () => {
+        bar.setAttribute('fill-opacity', '0.8');
+        const scale = container.clientWidth / W;
+        tip.show(`<b>${month} 2026</b><span><i style="background:var(--chart-1)"></i>Rs ${value.toFixed(1)}M collected</span>${month === 'Oct' ? '<span class="muted">Month in progress</span>' : ''}`, cx * scale, y(value) * scale);
+      };
+      const hide = () => { bar.removeAttribute('fill-opacity'); tip.hide(); };
+      hit.addEventListener('pointerenter', show);
+      hit.addEventListener('pointerleave', hide);
+      hit.addEventListener('focus', show);
+      hit.addEventListener('blur', hide);
+      svg.append(hit);
+    });
+    container.prepend(svg);
+  }
+
+  function attendanceChart() {
+    const container = document.getElementById('chart-attendance');
+    container.replaceChildren();
+    const days = ['22 Sep', '23 Sep', '24 Sep', '25 Sep', '26 Sep', '29 Sep', '30 Sep', '1 Oct', '2 Oct', '3 Oct', '6 Oct', '7 Oct', '8 Oct', '9 Oct'];
+    const series = [
+      { name: 'Grades 1 to 5', colour: 'var(--chart-1)', values: [94.1, 93.6, 95.2, 94.8, 92.9, 95.5, 96.1, 95.4, 94.9, 93.8, 95.7, 96.3, 95.9, 96.4] },
+      { name: 'Grades 6 to 10', colour: 'var(--chart-2)', values: [91.2, 90.4, 92.1, 91.5, 88.7, 91.9, 92.8, 92.2, 91.1, 89.6, 92.4, 93.1, 92.7, 93.0] },
+    ];
+    const W = 520, H = 230, left = 34, right = 46, top = 14, bottom = 26;
+    const plotW = W - left - right, plotH = H - top - bottom, min = 85, max = 100;
+    const x = (index) => left + (plotW * index) / (days.length - 1);
+    const y = (value) => top + plotH - ((value - min) / (max - min)) * plotH;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Attendance percent over 14 school days for two grade groups' });
+    for (const tick of [85, 90, 95, 100]) {
+      svg.append(el('line', { class: 'grid', x1: left, x2: W - right, y1: y(tick), y2: y(tick) }));
+      svg.append(el('text', { x: left - 6, y: y(tick) + 4, 'text-anchor': 'end' }, `${tick}%`));
+    }
+    for (const index of [0, 4, 9, 13]) svg.append(el('text', { x: x(index), y: H - 8, 'text-anchor': index === 0 ? 'start' : index === 13 ? 'end' : 'middle' }, days[index]));
+    for (const line of series) {
+      svg.append(el('polyline', { points: line.values.map((value, index) => `${x(index)},${y(value)}`).join(' '), fill: 'none', stroke: line.colour, 'stroke-width': 2, 'stroke-linejoin': 'miter' }));
+      const last = line.values.at(-1);
+      svg.append(el('rect', { x: x(13) - 5, y: y(last) - 5, width: 10, height: 10, fill: line.colour, stroke: 'var(--card)', 'stroke-width': 2 }));
+      svg.append(el('text', { class: 'val', x: x(13) + 10, y: y(last) + 4 }, `${last.toFixed(1)}%`));
+    }
+    const cross = el('line', { class: 'grid', y1: top, y2: top + plotH, stroke: 'var(--border-strong)', visibility: 'hidden' });
+    svg.append(cross);
+    const tip = tooltipFor(container);
+    const hit = el('rect', { class: 'hit', x: left, y: top, width: plotW, height: plotH, tabindex: 0, 'aria-label': 'Attendance chart. Use left and right arrow keys to read each day.' });
+    let active = days.length - 1;
+    const show = (index) => {
+      active = Math.min(days.length - 1, Math.max(0, index));
+      cross.setAttribute('x1', x(active));
+      cross.setAttribute('x2', x(active));
+      cross.setAttribute('visibility', 'visible');
+      const scale = container.clientWidth / W;
+      tip.show(`<b>${days[active]} 2026</b>` + series.map((line) => `<span><i style="background:${line.colour}"></i>${line.name} <b class="num">${line.values[active].toFixed(1)}%</b></span>`).join(''), x(active) * scale, y(Math.max(...series.map((line) => line.values[active]))) * scale);
+    };
+    const hide = () => { cross.setAttribute('visibility', 'hidden'); tip.hide(); };
+    hit.addEventListener('pointermove', (event) => {
+      const box = svg.getBoundingClientRect();
+      const px = ((event.clientX - box.left) / box.width) * W;
+      show(Math.round(((px - left) / plotW) * (days.length - 1)));
+    });
+    hit.addEventListener('pointerleave', hide);
+    hit.addEventListener('focus', () => show(active));
+    hit.addEventListener('blur', hide);
+    hit.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(active - 1);
+      if (event.key === 'ArrowRight') show(active + 1);
+    });
+    svg.append(hit);
+    container.prepend(svg);
+  }
+
+  function renderCharts() { feesChart(); attendanceChart(); }
+
+  applyTheme();
+})();
+</script>

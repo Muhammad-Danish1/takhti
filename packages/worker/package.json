@@ -1,0 +1,22 @@
+{
+  "name": "@takhti/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The background job runner process.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@takhti/core": "workspace:*",
+    "@takhti/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@takhti/config": "workspace:*",
+    "@types/node": "22.20.5",
+    "typescript": "7.0.2"
+  }
+}

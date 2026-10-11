@@ -1,0 +1,28 @@
+{
+  "name": "school-erp-backend-reference",
+  "private": true,
+  "type": "module",
+  "description": "Reference skeleton: one module (students) through every backend layer, type-checked against the real library versions.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx tests/students.e2e.ts",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.3",
+    "@tanstack/react-query": "5.104.1",
+    "drizzle-orm": "1.0.0-rc.4",
+    "postgres": "3.4.9",
+    "react": "^19.0.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "drizzle-kit": "1.0.0-rc.4",
+    "tsx": "^4.23.15",
+    "typescript": "7.0.2"
+  }
+}

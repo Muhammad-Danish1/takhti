@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@takhti/config/tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./apps/web/src/*"]
+    }
+  },
+  "include": ["tests/**/*.ts", "vitest.config.ts", "packages/db/drizzle.config.ts"],
+  "exclude": ["node_modules", "tests/e2e"]
+}

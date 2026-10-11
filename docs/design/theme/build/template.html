@@ -1,0 +1,1071 @@
+<title>Kashi School Theme</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Lexend:wght@400;500;600&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap">
+<style>
+/* Layout concept: a ruled page. Square corners, one-pixel lines, a 4px grid; colour only for actions and status. */
+/*@TOKENS@*/
+
+:root {
+  --font-display: "Lexend", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Urdu Typesetting", serif;
+  --shadow-float: 0 12px 28px rgb(0 0 0 / 0.16), 0 2px 6px rgb(0 0 0 / 0.1);
+}
+
+*, *::before, *::after { box-sizing: border-box; border-radius: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font: 400 14px/1.5 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+a { color: var(--link); text-underline-offset: 3px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.i { width: 18px; height: 18px; fill: currentColor; flex: none; }
+.i-sm { width: 16px; height: 16px; }
+.num { font-variant-numeric: tabular-nums; }
+.code { font-family: var(--font-mono); font-size: 12px; }
+.muted { color: var(--muted-foreground); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.label {
+  font: 600 11px/1.2 var(--font-sans);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.wrap { max-width: 1320px; margin-inline: auto; padding-inline: clamp(16px, 3vw, 32px); }
+
+/* ---------- page bar ---------- */
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.bar-in { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; min-height: 52px; padding-block: 8px; }
+.bar-brand { display: flex; align-items: center; gap: 10px; color: var(--foreground); text-decoration: none; }
+.bar-brand b { font: 600 16px/1 var(--font-display); letter-spacing: -0.01em; }
+.bar-brand span { font-size: 12.5px; color: var(--muted-foreground); }
+.bar-nav { display: flex; gap: 2px; margin-right: auto; }
+.bar-nav a { padding: 6px 10px; font-size: 13px; color: var(--muted-foreground); text-decoration: none; }
+.bar-nav a:hover { color: var(--foreground); background: var(--muted); }
+.bar-ctl { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+@media (max-width: 1040px) { .bar-nav { display: none; } }
+
+/* ---------- shared controls ---------- */
+.seg { display: inline-flex; border: 1px solid var(--border-strong); background: var(--card); }
+.seg button {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 10px;
+  border: 0; border-right: 1px solid var(--border-strong);
+  background: transparent; color: var(--muted-foreground);
+  font-size: 12.5px; cursor: pointer; white-space: nowrap;
+}
+.seg button:last-child { border-right: 0; }
+.seg button:hover { color: var(--foreground); background: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-foreground); font-weight: 600; }
+.seg .count { font: 400 11.5px var(--font-mono); color: var(--muted-foreground); }
+.chip { width: 14px; height: 10px; flex: none; outline: 1px solid var(--border-strong); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 32px; padding: 0 12px;
+  border: 1px solid transparent;
+  font: 500 13px/1 var(--font-sans); white-space: nowrap; cursor: pointer; text-decoration: none;
+}
+.btn-primary { background: var(--primary); color: var(--primary-foreground); }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { background: var(--card); color: var(--foreground); border-color: var(--border-strong); }
+.btn-outline:hover { background: var(--muted); }
+.btn-ghost { background: transparent; color: var(--foreground); }
+.btn-ghost:hover { background: var(--muted); }
+.btn-danger { background: var(--destructive); color: var(--destructive-foreground); }
+.btn-sm { height: 28px; padding: 0 10px; font-size: 12.5px; gap: 6px; }
+.btn-lg { height: 40px; padding: 0 16px; font-size: 14px; }
+.btn-icon { width: 32px; padding: 0; }
+.btn-icon.btn-sm { width: 28px; }
+.btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.input, .select {
+  height: 32px; width: 100%; padding: 0 10px;
+  background: var(--card); color: var(--foreground);
+  border: 1px solid var(--input);
+  font-size: 13px;
+}
+.input::placeholder { color: var(--muted-foreground); }
+.input:focus-visible, .select:focus-visible { outline: 2px solid var(--ring); outline-offset: -1px; }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.select { appearance: none; padding-right: 30px; cursor: pointer; }
+.select-wrap, .search { position: relative; display: block; }
+.select-wrap .i { position: absolute; right: 7px; top: 7px; pointer-events: none; color: var(--muted-foreground); }
+.search .i { position: absolute; left: 8px; top: 7px; color: var(--muted-foreground); pointer-events: none; }
+.search .input { padding-left: 32px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.field .hint { font-size: 12px; color: var(--muted-foreground); }
+.field .hint.error { color: var(--danger); }
+
+.check, .radio, .switch { appearance: none; margin: 0; flex: none; cursor: pointer; background: var(--card); }
+.check { width: 16px; height: 16px; border: 1px solid var(--input); display: inline-grid; place-content: center; }
+.check::after { content: ""; width: 10px; height: 10px; background: var(--primary-foreground); clip-path: polygon(13% 50%, 0 64%, 38% 100%, 100% 22%, 87% 9%, 37% 72%); transform: scale(0); }
+.check:checked { background: var(--primary); border-color: var(--primary); }
+.check:checked::after { transform: scale(1); }
+/* A radio is a diamond, so it can never be mistaken for a checkbox even with square corners. */
+.radio { width: 13px; height: 13px; margin: 2px 3px; rotate: 45deg; border: 1px solid var(--input); display: inline-grid; place-content: center; }
+.radio::after { content: ""; width: 5px; height: 5px; background: var(--primary); transform: scale(0); }
+.radio:checked { border-color: var(--primary); }
+.radio:checked::after { transform: scale(1); }
+.switch { width: 32px; height: 18px; background: var(--input); position: relative; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: var(--card); transition: translate 0.12s; }
+.switch:checked { background: var(--primary); }
+.switch:checked::after { translate: 14px 0; background: var(--primary-foreground); }
+.choice { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 22px; padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--muted); color: var(--muted-foreground);
+  font: 500 12px/1 var(--font-sans); white-space: nowrap;
+}
+.badge::before { content: ""; width: 6px; height: 6px; background: currentColor; }
+.badge.success { color: var(--success); background: var(--success-subtle); border-color: var(--success-border); }
+.badge.warning { color: var(--warning); background: var(--warning-subtle); border-color: var(--warning-border); }
+.badge.danger { color: var(--danger); background: var(--danger-subtle); border-color: var(--danger-border); }
+.badge.info { color: var(--info); background: var(--info-subtle); border-color: var(--info-border); }
+.badge.plain::before { display: none; }
+
+.avatar {
+  display: inline-grid; place-content: center; flex: none;
+  width: 28px; height: 28px;
+  background: var(--brand); color: var(--brand-foreground);
+  font: 600 11px/1 var(--font-sans); letter-spacing: 0.02em;
+}
+.avatar.sm { width: 22px; height: 22px; font-size: 10px; }
+.meter { height: 6px; background: var(--accent); }
+.meter > i { display: block; height: 100%; background: var(--primary); }
+
+/* ---------- logo ---------- */
+.mark { display: block; flex: none; }
+.on-dark {
+  --logo-tile: var(--logo-inv-tile);
+  --logo-page-1: var(--logo-inv-page-1);
+  --logo-page-2: var(--logo-inv-page-2);
+  --logo-spark: var(--logo-inv-spark);
+}
+.wordmark { font: 600 17px/1 var(--font-display); letter-spacing: -0.015em; }
+
+/* ---------- sections ---------- */
+.intro { padding-block: 40px 28px; display: grid; gap: 14px; }
+.intro h1 { font: 500 clamp(34px, 5vw, 52px)/1.05 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
+.intro h1 mark { background: var(--spark); color: var(--brand-foreground); padding: 0 0.14em; }
+.lede { max-width: 66ch; font-size: 16px; color: var(--muted-foreground); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); border: 1px solid var(--border); background: var(--card); margin-top: 8px; }
+.facts li { padding: 12px 16px; border-left: 1px solid var(--border); margin-left: -1px; display: grid; gap: 2px; font-size: 12.5px; color: var(--muted-foreground); }
+.facts b { font: 600 22px/1.1 var(--font-sans); color: var(--foreground); }
+
+.section { padding-block: 28px; display: grid; gap: 16px; }
+.section-head { display: grid; gap: 4px; }
+.section-head h2 { font: 500 22px/1.2 var(--font-display); letter-spacing: -0.015em; }
+.section-head p { max-width: 70ch; color: var(--muted-foreground); }
+.grid { display: grid; gap: 16px; }
+.section > *, .intro > *, .grid > *, .card-body > * { min-width: 0; }
+.cols-2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); }
+.cols-3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.card { background: var(--card); border: 1px solid var(--border); min-width: 0; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.card-head h3 { font: 600 13px/1.3 var(--font-sans); }
+.card-body { padding: 16px; display: grid; gap: 14px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* ---------- app preview ---------- */
+.mock { border: 1px solid var(--border-strong); background: var(--background); overflow-x: auto; }
+.app { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-width: 1120px; }
+.side { background: var(--sidebar); color: var(--sidebar-foreground); display: flex; flex-direction: column; border-right: 1px solid var(--sidebar-border); }
+.side-brand { height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--sidebar-border); }
+.side-brand .wordmark { color: #fff; font-size: 16px; }
+.side-branch {
+  margin: 10px 8px 2px; padding: 7px 8px;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  background: transparent; color: inherit; border: 1px solid var(--sidebar-border); cursor: pointer;
+}
+.side-branch:hover { background: var(--sidebar-accent); }
+.side-branch span.t { display: grid; min-width: 0; margin-right: auto; }
+.side-branch b { font: 600 12.5px/1.3 var(--font-sans); }
+.side-branch small { font-size: 11px; color: var(--sidebar-muted); }
+.side-branch .i { color: var(--sidebar-muted); }
+.nav-label { padding: 16px 16px 6px; font: 600 10.5px/1 var(--font-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--sidebar-muted); }
+.nav { display: grid; gap: 1px; }
+.nav a {
+  display: flex; align-items: center; gap: 10px;
+  height: 32px; margin: 0 8px; padding: 0 8px;
+  color: var(--sidebar-foreground); text-decoration: none; font-size: 13px;
+}
+.nav a:hover { background: color-mix(in oklab, var(--sidebar-accent) 55%, transparent); }
+.nav a[aria-current="page"] { background: var(--sidebar-accent); color: var(--sidebar-accent-foreground); font-weight: 500; box-shadow: inset 2px 0 0 var(--sidebar-primary); }
+.nav .i { color: var(--sidebar-muted); }
+.nav a[aria-current="page"] .i { color: inherit; }
+.nav-count { margin-left: auto; padding: 1px 6px; background: var(--sidebar-primary); color: var(--brand-foreground); font: 600 11px/1.4 var(--font-sans); }
+.side-foot { margin-top: auto; padding: 8px 0 10px; border-top: 1px solid var(--sidebar-border); display: grid; gap: 1px; }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+.top { height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 20px; background: var(--card); border-bottom: 1px solid var(--border); }
+.crumbs { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: var(--muted-foreground); margin-right: auto; }
+.crumbs b { color: var(--foreground); font-weight: 600; }
+.top .search { width: 240px; }
+.content { padding: 20px; display: grid; gap: 16px; }
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.page-head h3 { font: 500 20px/1.25 var(--font-display); letter-spacing: -0.01em; }
+.page-head p { font-size: 12.5px; color: var(--muted-foreground); }
+
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--card); border: 1px solid var(--border); }
+.kpi { padding: 14px 16px; display: grid; gap: 6px; align-content: start; border-left: 1px solid var(--border); }
+.kpi:first-child { border-left: 0; }
+.kpi .value { font: 600 24px/1.1 var(--font-sans); letter-spacing: -0.01em; }
+.kpi .value small { font: 500 13px/1 var(--font-sans); color: var(--muted-foreground); margin-right: 3px; }
+.kpi .sub { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted-foreground); }
+.kpi .sub.bad { color: var(--danger); }
+.kpi .sub .i { width: 14px; height: 14px; }
+
+.panel { background: var(--card); border: 1px solid var(--border); min-width: 0; }
+.panel-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.panel-row .spacer { margin-right: auto; }
+.panel-row .search { width: 260px; }
+.panel-row .select-wrap { width: 150px; }
+.table-wrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data th {
+  height: 36px; padding: 0 12px; text-align: left; white-space: nowrap;
+  background: var(--table-header); color: var(--table-header-foreground);
+  font: 600 12px/1 var(--font-sans); letter-spacing: 0.01em;
+}
+.data td { height: 40px; padding: 0 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.data tbody tr:hover { background: var(--row-hover); }
+.data tbody tr[aria-selected="true"] { background: var(--accent); }
+.data .r { text-align: right; }
+.data .who { display: grid; line-height: 1.25; }
+.data .who small { font-size: 11.5px; color: var(--muted-foreground); }
+.data .late { color: var(--danger); }
+.data th .check { border-color: color-mix(in oklab, var(--table-header-foreground) 60%, transparent); background: transparent; }
+.panel-foot { display: flex; align-items: center; gap: 12px; padding: 8px 12px; font-size: 12.5px; color: var(--muted-foreground); }
+.panel-foot .select-wrap { width: 68px; }
+.panel-foot .select { height: 28px; font-size: 12.5px; }
+.panel-foot .select-wrap .i { top: 5px; }
+.pager { display: inline-flex; gap: 4px; }
+
+/* ---------- brand ---------- */
+.brand-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); border: 1px solid var(--border); }
+.brand-tile { min-height: 168px; padding: 16px; display: grid; align-content: space-between; gap: 20px; border-left: 1px solid var(--border); margin-left: -1px; }
+.brand-tile.paper { background: var(--card); }
+.brand-tile.ink { background: var(--sidebar); color: #fff; }
+.brand-tile.solid { background: var(--logo-tile); color: #fff; }
+.brand-tile.ink .label, .brand-tile.solid .label { color: inherit; opacity: 0.75; }
+.lockup { display: flex; align-items: center; gap: 14px; }
+.lockup .wordmark { font-size: 30px; }
+.lockup small { display: block; margin-top: 6px; font: 600 10.5px/1 var(--font-sans); letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.7; }
+.lockup-ur { font: 600 30px/1.9 var(--font-urdu); }
+.sizes { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+.sizes figure { display: grid; gap: 6px; justify-items: start; font: 400 11px var(--font-mono); color: var(--muted-foreground); }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border: 1px solid var(--border); }
+.role { display: grid; grid-template-rows: 56px auto; border-left: 1px solid var(--border); margin-left: -1px; background: var(--card); }
+.role div { padding: 10px 12px; display: grid; gap: 2px; font-size: 12px; color: var(--muted-foreground); }
+.role b { font: 600 13px/1.3 var(--font-sans); color: var(--foreground); }
+.role .ur { font: 400 15px/1.9 var(--font-urdu); color: var(--foreground); justify-self: start; }
+body:not([data-palette="kashi"]) .kashi-only { display: none; }
+
+/* ---------- colour ---------- */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.swatch { border: 1px solid var(--border); background: var(--card); min-width: 0; }
+.swatch i { display: block; height: 44px; border-bottom: 1px solid var(--border); }
+.swatch div { padding: 8px 10px; display: grid; gap: 1px; }
+.swatch b { font: 500 12px/1.3 var(--font-mono); overflow-wrap: anywhere; }
+.swatch span { font: 400 11.5px/1.3 var(--font-mono); color: var(--muted-foreground); }
+.group-title { margin-top: 6px; }
+.states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.state-list { display: grid; gap: 0; }
+.state-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 16px; border-top: 1px solid var(--border); font-size: 13px; }
+.state-list li:first-child { border-top: 0; }
+
+/* ---------- type ---------- */
+.specimen { display: grid; }
+.specimen > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; align-items: baseline; padding: 12px 16px; border-top: 1px solid var(--border); }
+.specimen > div:first-child { border-top: 0; }
+.specimen .what { display: grid; gap: 2px; font-size: 12px; color: var(--muted-foreground); }
+.specimen .what b { font: 600 12.5px var(--font-sans); color: var(--foreground); }
+.t-display { font: 500 30px/1.15 var(--font-display); letter-spacing: -0.02em; }
+.t-title { font: 500 20px/1.25 var(--font-display); letter-spacing: -0.01em; }
+.t-body { font-size: 14px; max-width: 62ch; }
+.t-ui { font-size: 13px; }
+.t-urdu { font: 400 19px/2.1 var(--font-urdu); }
+@media (max-width: 560px) { .specimen > div { grid-template-columns: 1fr; gap: 4px; } }
+
+/* ---------- components ---------- */
+.tabs { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab { height: 36px; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; color: var(--muted-foreground); font-size: 13px; cursor: pointer; white-space: nowrap; }
+.tab:hover { color: var(--foreground); }
+.tab[aria-selected="true"] { color: var(--foreground); border-bottom-color: var(--primary); font-weight: 600; }
+.note { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px 12px; border: 1px solid; border-left-width: 3px; font-size: 13px; }
+.note b { display: block; font-weight: 600; }
+.note.info { color: var(--info); background: var(--info-subtle); border-color: var(--info-border); border-left-color: var(--info); }
+.note.success { color: var(--success); background: var(--success-subtle); border-color: var(--success-border); border-left-color: var(--success); }
+.note.warning { color: var(--warning); background: var(--warning-subtle); border-color: var(--warning-border); border-left-color: var(--warning); }
+.note.danger { color: var(--danger); background: var(--danger-subtle); border-color: var(--danger-border); border-left-color: var(--danger); }
+.note p { color: var(--foreground); }
+.menu { width: 220px; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border-strong); box-shadow: var(--shadow-float); padding: 4px; display: grid; gap: 1px; }
+.menu button { display: flex; align-items: center; gap: 10px; height: 30px; padding: 0 8px; border: 0; background: none; font-size: 13px; text-align: left; cursor: pointer; }
+.menu button:hover, .menu button.hover { background: var(--accent); color: var(--accent-foreground); }
+.menu button kbd { margin-left: auto; font: 400 11px var(--font-mono); color: var(--muted-foreground); }
+.menu hr { border: 0; border-top: 1px solid var(--border); margin: 3px -4px; }
+.menu .danger { color: var(--danger); }
+.dialog { max-width: 420px; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border-strong); box-shadow: var(--shadow-float); }
+.dialog header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.dialog h4 { font: 500 16px/1.3 var(--font-display); }
+.dialog .body { padding: 16px; display: grid; gap: 14px; }
+.dialog footer { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); background: var(--muted); }
+.toast { display: flex; align-items: center; gap: 10px; max-width: 360px; padding: 10px 12px; background: var(--sidebar); color: #fff; border-left: 3px solid var(--brand); box-shadow: var(--shadow-float); font-size: 13px; }
+.toast .btn { margin-left: auto; color: #fff; }
+.toast .btn:hover { background: rgb(255 255 255 / 0.14); }
+.tip { display: inline-block; padding: 5px 8px; background: var(--foreground); color: var(--background); font-size: 12px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+
+/* ---------- charts ---------- */
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font: 400 11px var(--font-sans); fill: var(--muted-foreground); }
+.chart .val { font-weight: 600; fill: var(--foreground); }
+.chart .grid { stroke: var(--chart-grid); stroke-width: 1; }
+.chart .hit { fill: transparent; cursor: default; }
+.chart .hit:focus-visible { outline: 2px solid var(--ring); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted-foreground); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 3px; }
+.tooltip { position: absolute; z-index: 2; pointer-events: none; min-width: 120px; padding: 6px 8px; background: var(--popover); color: var(--popover-foreground); border: 1px solid var(--border-strong); box-shadow: var(--shadow-float); font-size: 12px; display: grid; gap: 2px; }
+.tooltip b { font-weight: 600; }
+.tooltip span { display: flex; align-items: center; gap: 6px; }
+.tooltip i { width: 8px; height: 8px; flex: none; }
+.stack { display: flex; gap: 2px; height: 14px; }
+.stack i { display: block; }
+
+/* ---------- rules ---------- */
+.rules { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rules th, .rules td { text-align: left; vertical-align: top; padding: 9px 16px; border-top: 1px solid var(--border); }
+.rules tr:first-child th, .rules tr:first-child td { border-top: 0; }
+.rules th { width: 150px; font-weight: 600; white-space: nowrap; }
+.scale { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.scale figure { display: grid; gap: 6px; justify-items: center; font: 400 11px var(--font-mono); color: var(--muted-foreground); }
+.scale i { display: block; background: var(--primary); height: 28px; }
+.foot { padding-block: 24px 40px; color: var(--muted-foreground); font-size: 12.5px; border-top: 1px solid var(--border); margin-top: 16px; }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .switch::after { transition: none; } }
+</style>
+
+<!--@SPRITE@-->
+
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="bar-brand" href="#top"><svg class="mark" width="24" height="24" aria-hidden="true"><use href="#mark"/></svg><b>Kashi</b><span>school theme</span></a>
+    <nav class="bar-nav" aria-label="Sections">
+      <a href="#preview">Screen</a><a href="#brand">Brand</a><a href="#colour">Colour</a><a href="#type">Type</a><a href="#components">Components</a><a href="#rules">Layout rules</a>
+    </nav>
+    <div class="bar-ctl">
+      <div class="seg" role="group" aria-label="Colour palette" id="palette-ctl">
+        <button type="button" data-palette="kashi" aria-pressed="true"><i class="chip chip-kashi"></i>Kashi</button>
+        <button type="button" data-palette="sabz" aria-pressed="false"><i class="chip chip-sabz"></i>Sabz</button>
+        <button type="button" data-palette="siyahi" aria-pressed="false"><i class="chip chip-siyahi"></i>Siyahi</button>
+      </div>
+      <div class="seg" role="group" aria-label="Light or dark" id="mode-ctl">
+        <button type="button" data-mode="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-mode="light" aria-pressed="false"><svg class="i i-sm" aria-hidden="true"><use href="#i-light_mode"/></svg>Light</button>
+        <button type="button" data-mode="dark" aria-pressed="false"><svg class="i i-sm" aria-hidden="true"><use href="#i-dark_mode"/></svg>Dark</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap intro" id="top">
+    <p class="label">Theme proposal for Grades 1 to 10 school software</p>
+    <h1>Square corners, clear <mark>colour</mark>.</h1>
+    <p class="lede"><span class="kashi-only">Cobalt, turquoise and white are the three glazes of Multan&rsquo;s kashi tile work. Kashi sets them on a ruled page with sharp corners and one-pixel lines.</span> Colour is kept for two jobs only, the action you can take and the status of a record, so a fee table reads at a glance in light and in dark.</p>
+    <ul class="facts">
+      <li><b>0</b>corner radius, everywhere</li>
+      <li><b>1px</b>lines instead of shadows</li>
+      <li><b>4px</b>spacing grid</li>
+      <li><b>AA</b>contrast in both modes</li>
+    </ul>
+  </section>
+
+  <section class="wrap section" id="preview">
+    <div class="section-head">
+      <p class="label">Screen</p>
+      <h2>Fee vouchers</h2>
+      <p>The layout of your two references with school data in it. Switch palette and mode in the bar above.</p>
+    </div>
+    <div class="mock" tabindex="0" role="group" aria-label="Fee vouchers screen preview">
+      <div class="app">
+        <aside class="side on-dark">
+          <div class="side-brand"><svg class="mark" width="22" height="22" aria-hidden="true"><use href="#mark"/></svg><span class="wordmark" data-brand>Takhti</span></div>
+          <button class="side-branch" type="button"><span class="avatar sm">MC</span><span class="t"><b>Main Campus</b><small>Lahore &middot; Principal</small></span><svg class="i i-sm" aria-hidden="true"><use href="#i-unfold_more"/></svg></button>
+          <p class="nav-label">School</p>
+          <nav class="nav" aria-label="School">
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-dashboard"/></svg>Dashboard</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-group"/></svg>Students</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-how_to_reg"/></svg>Admissions</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-event_available"/></svg>Attendance</a>
+            <a href="#preview" aria-current="page"><svg class="i" aria-hidden="true"><use href="#i-payments"/></svg>Fees<span class="nav-count">87</span></a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-quiz"/></svg>Exams</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-calendar_month"/></svg>Timetable</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-badge"/></svg>Staff</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-directions_bus"/></svg>Transport</a>
+          </nav>
+          <p class="nav-label">Head office</p>
+          <nav class="nav" aria-label="Head office">
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-domain"/></svg>Branches</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-bar_chart"/></svg>Reports</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-settings"/></svg>Settings</a>
+          </nav>
+          <div class="side-foot nav">
+            <a href="#preview"><span class="avatar sm">SA</span>Sana Ahmed</a>
+            <a href="#preview"><svg class="i" aria-hidden="true"><use href="#i-logout"/></svg>Sign out</a>
+          </div>
+        </aside>
+
+        <div class="main">
+          <div class="top">
+            <div class="crumbs"><span>Fees</span><svg class="i i-sm" aria-hidden="true"><use href="#i-chevron_right"/></svg><b>Vouchers</b></div>
+            <label class="search"><svg class="i i-sm" aria-hidden="true"><use href="#i-search"/></svg><input class="input" id="mock-global-search" placeholder="Search students, vouchers" aria-label="Search students and vouchers"></label>
+            <button class="btn btn-ghost btn-icon" type="button" aria-label="Notifications"><svg class="i" aria-hidden="true"><use href="#i-notifications"/></svg></button>
+            <span class="avatar">SA</span>
+          </div>
+          <div class="content">
+            <div class="page-head">
+              <div>
+                <h3>Fee vouchers</h3>
+                <p>October 2026 &middot; issued 1 Oct, due 10 Oct &middot; Main Campus</p>
+              </div>
+              <div class="row">
+                <button class="btn btn-outline" type="button"><svg class="i" aria-hidden="true"><use href="#i-print"/></svg>Print challans</button>
+                <button class="btn btn-primary" type="button"><svg class="i" aria-hidden="true"><use href="#i-add"/></svg>Collect fee</button>
+              </div>
+            </div>
+
+            <div class="kpis">
+              <div class="kpi"><span class="label">Billed this month</span><span class="value"><small>Rs</small>9.84M</span><span class="sub">1,248 vouchers</span></div>
+              <div class="kpi"><span class="label">Collected</span><span class="value"><small>Rs</small>7.41M</span><div class="meter" role="img" aria-label="75 percent of billed amount collected"><i style="width:75%"></i></div><span class="sub">75% of billed</span></div>
+              <div class="kpi"><span class="label">Outstanding</span><span class="value"><small>Rs</small>2.43M</span><span class="sub">336 vouchers open</span></div>
+              <div class="kpi"><span class="label">Overdue</span><span class="value">87</span><span class="sub bad"><svg class="i" aria-hidden="true"><use href="#i-arrow_upward"/></svg>12 more than September</span></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-row">
+                <div class="seg" role="group" aria-label="Voucher status" data-toggle>
+                  <button type="button" aria-pressed="true">All <span class="count">1,248</span></button>
+                  <button type="button" aria-pressed="false">Paid <span class="count">912</span></button>
+                  <button type="button" aria-pressed="false">Partial <span class="count">96</span></button>
+                  <button type="button" aria-pressed="false">Unpaid <span class="count">153</span></button>
+                  <button type="button" aria-pressed="false">Overdue <span class="count">87</span></button>
+                </div>
+                <span class="spacer"></span>
+                <button class="btn btn-outline btn-sm" type="button"><svg class="i i-sm" aria-hidden="true"><use href="#i-download"/></svg>Export</button>
+              </div>
+              <div class="panel-row">
+                <label class="search"><svg class="i i-sm" aria-hidden="true"><use href="#i-search"/></svg><input class="input" id="mock-table-search" placeholder="Name, admission or voucher no." aria-label="Search vouchers"></label>
+                <label class="select-wrap"><select class="select" id="mock-class" aria-label="Class"><option>All classes</option><option>Grade 1</option><option>Grade 5</option><option>Grade 8</option><option>Grade 10</option></select><svg class="i" aria-hidden="true"><use href="#i-expand_more"/></svg></label>
+                <button class="btn btn-outline" type="button"><svg class="i" aria-hidden="true"><use href="#i-filter_list"/></svg>Filters</button>
+                <span class="spacer"></span>
+                <span class="muted" style="font-size:12.5px">1 selected</span>
+                <button class="btn btn-outline btn-sm" type="button">Send reminder</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data">
+                  <thead>
+                    <tr>
+                      <th style="width:36px"><input class="check" type="checkbox" id="mock-all" aria-label="Select all"></th>
+                      <th>Voucher</th><th>Student</th><th>Class</th>
+                      <th class="r">Billed (Rs)</th><th class="r">Paid (Rs)</th><th class="r">Balance (Rs)</th>
+                      <th>Due</th><th>Status</th><th style="width:44px"><span class="sr">Actions</span></th>
+                    </tr>
+                  </thead>
+                  <tbody id="voucher-rows"></tbody>
+                </table>
+              </div>
+              <div class="panel-foot">
+                <span>Showing <b class="num">1 to 8</b> of <b class="num">1,248</b></span>
+                <span class="spacer" style="margin-right:auto"></span>
+                <span>Rows</span>
+                <label class="select-wrap"><select class="select" id="mock-rows" aria-label="Rows per page"><option>8</option><option>25</option><option>50</option></select><svg class="i i-sm" aria-hidden="true"><use href="#i-expand_more"/></svg></label>
+                <span class="num">Page 1 of 156</span>
+                <span class="pager">
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="First page" disabled><svg class="i i-sm" aria-hidden="true"><use href="#i-keyboard_double_arrow_left"/></svg></button>
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="Previous page" disabled><svg class="i i-sm" aria-hidden="true"><use href="#i-chevron_left"/></svg></button>
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="Next page"><svg class="i i-sm" aria-hidden="true"><use href="#i-chevron_right"/></svg></button>
+                  <button class="btn btn-outline btn-sm btn-icon" type="button" aria-label="Last page"><svg class="i i-sm" aria-hidden="true"><use href="#i-keyboard_double_arrow_right"/></svg></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="brand">
+    <div class="section-head">
+      <p class="label">Brand</p>
+      <h2>Logo</h2>
+      <p>An open book with one coloured page and a spark above the spine. It is drawn from straight lines only, so it matches the square corners of the product. The name is a working name; type yours to try it.</p>
+    </div>
+    <div class="row">
+      <div class="field" style="width:min(100%,260px)">
+        <label class="label" for="brand-name">Working name</label>
+        <input class="input" id="brand-name" value="Takhti" maxlength="18" autocomplete="off">
+      </div>
+      <p class="muted" style="max-width:52ch;font-size:12.5px">A takhti is the wooden slate children in Pakistan learn to write on. Other candidates: Darsgah, Nisaab, Rehbar.</p>
+    </div>
+    <div class="brand-tiles">
+      <div class="brand-tile paper">
+        <div class="lockup"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark"/></svg><div><span class="wordmark" data-brand>Takhti</span><small>School OS</small></div></div>
+        <span class="label">On paper</span>
+      </div>
+      <div class="brand-tile ink on-dark">
+        <div class="lockup"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark"/></svg><div><span class="wordmark" data-brand>Takhti</span><small>School OS</small></div></div>
+        <span class="label">On ink</span>
+      </div>
+      <div class="brand-tile solid">
+        <div class="lockup"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark-bare"/></svg><div><span class="wordmark" data-brand>Takhti</span><small>School OS</small></div></div>
+        <span class="label">One colour</span>
+      </div>
+      <div class="brand-tile paper">
+        <div class="lockup" dir="rtl" lang="ur"><svg class="mark" width="52" height="52" aria-hidden="true"><use href="#mark"/></svg><span class="lockup-ur">تختی</span></div>
+        <span class="label">Urdu, for the working name</span>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="card-head"><h3>Sizes</h3><span class="muted" style="font-size:12px">Readable down to a 16px favicon</span></div>
+        <div class="card-body">
+          <div class="sizes">
+            <figure><svg class="mark" width="72" height="72" aria-hidden="true"><use href="#mark"/></svg>72</figure>
+            <figure><svg class="mark" width="40" height="40" aria-hidden="true"><use href="#mark"/></svg>40</figure>
+            <figure><svg class="mark" width="24" height="24" aria-hidden="true"><use href="#mark"/></svg>24</figure>
+            <figure><svg class="mark" width="16" height="16" aria-hidden="true"><use href="#mark"/></svg>16</figure>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>How the colours are used</h3></div>
+        <div class="roles" style="border:0">
+          <div class="role"><i style="background:var(--primary)"></i><div><b>Primary</b><span class="kashi-only ur" lang="ur" dir="rtl">لاجورد</span><span>Buttons, links, table header</span></div></div>
+          <div class="role"><i style="background:var(--brand)"></i><div><b>Highlight</b><span class="kashi-only ur" lang="ur" dir="rtl">فیروزہ</span><span>Active marker, avatars</span></div></div>
+          <div class="role"><i style="background:var(--spark)"></i><div><b>Spark</b><span class="kashi-only ur" lang="ur" dir="rtl">گیندا</span><span>Logo and marketing only</span></div></div>
+          <div class="role"><i style="background:var(--sidebar)"></i><div><b>Ink</b><span class="kashi-only ur" lang="ur" dir="rtl">سیاہی</span><span>Sidebar, toasts</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="colour">
+    <div class="section-head">
+      <p class="label">Colour</p>
+      <h2>Tokens</h2>
+      <p>Every value below is live for the palette and mode you have selected. Text pairs meet WCAG AA, and the chart colours are checked for colour-blind separation.</p>
+    </div>
+    <div id="swatch-groups" class="grid"></div>
+
+    <div class="section-head group-title">
+      <h2 style="font-size:17px">Status in school terms</h2>
+      <p>Status colours never change with the brand palette, and a status always carries its word.</p>
+    </div>
+    <div class="states">
+      <div class="card">
+        <div class="card-head"><h3>Fees</h3></div>
+        <ul class="state-list">
+          <li><span>Paid in full</span><span class="badge success">Paid</span></li>
+          <li><span>Part of the voucher paid</span><span class="badge warning">Partial</span></li>
+          <li><span>Not yet due</span><span class="badge">Unpaid</span></li>
+          <li><span>Past the due date</span><span class="badge danger">Overdue</span></li>
+          <li><span>Paid ahead</span><span class="badge info">Advance</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Attendance</h3></div>
+        <ul class="state-list">
+          <li><span>In class</span><span class="badge success">Present</span></li>
+          <li><span>Arrived after the bell</span><span class="badge warning">Late</span></li>
+          <li><span>Not in school</span><span class="badge danger">Absent</span></li>
+          <li><span>Approved leave</span><span class="badge info">Leave</span></li>
+          <li><span>Not marked yet</span><span class="badge">Pending</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Results</h3></div>
+        <ul class="state-list">
+          <li><span>40% or above in every subject</span><span class="badge success">Pass</span></li>
+          <li><span>Below 40% in a subject</span><span class="badge danger">Fail</span></li>
+          <li><span>Marks entered, not published</span><span class="badge warning">Under review</span></li>
+          <li><span>Visible to parents</span><span class="badge info">Published</span></li>
+          <li><span>Exam not held yet</span><span class="badge">Scheduled</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="type">
+    <div class="section-head">
+      <p class="label">Type</p>
+      <h2>Four typefaces, one job each</h2>
+      <p>Round letters in the headings soften the square layout. The text face is built for dense tables, and codes get a face where 0 and O, 1 and l can never be confused.</p>
+    </div>
+    <div class="card specimen">
+      <div><div class="what"><b>Display</b><span>Lexend 500</span></div><p class="t-display">Admissions open for 2027</p></div>
+      <div><div class="what"><b>Page title</b><span>Lexend 500, 20px</span></div><p class="t-title">Fee vouchers</p></div>
+      <div><div class="what"><b>Body</b><span>IBM Plex Sans, 14px</span></div><p class="t-body">Vouchers are issued on the 1st and fall due on the 10th. A late fine of Rs 500 is added after the due date, and arrears carry forward to next month.</p></div>
+      <div><div class="what"><b>Interface</b><span>IBM Plex Sans, 13px</span></div><p class="t-ui">Ayesha Imran &middot; Grade 8-B &middot; 1,248 vouchers &middot; Page 1 of 156</p></div>
+      <div><div class="what"><b>Label</b><span>11px, capitals, spaced</span></div><p class="label">Billed this month</p></div>
+      <div><div class="what"><b>Codes</b><span>IBM Plex Mono</span></div><p class="code" style="font-size:13px">FV-2610-0412 &nbsp; 35202-1234567-1 &nbsp; ADM-0O1lI</p></div>
+      <div><div class="what"><b>Urdu</b><span>Noto Nastaliq Urdu</span></div><p class="t-urdu" lang="ur" dir="rtl">علم روشنی ہے &nbsp;·&nbsp; فیس واؤچر &nbsp;·&nbsp; طلبہ کی حاضری &nbsp;·&nbsp; رپورٹ کارڈ</p></div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="components">
+    <div class="section-head">
+      <p class="label">Components</p>
+      <h2>Building blocks</h2>
+      <p>The same pieces the real screens will use. They are live: hover, focus with Tab, tick and switch them.</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="card-head"><h3>Buttons</h3></div>
+        <div class="card-body">
+          <div class="row">
+            <button class="btn btn-primary" type="button">Collect fee</button>
+            <button class="btn btn-outline" type="button">Print challan</button>
+            <button class="btn btn-ghost" type="button">Cancel</button>
+            <button class="btn btn-danger" type="button">Delete voucher</button>
+            <button class="btn btn-primary" type="button" disabled>Disabled</button>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary btn-sm" type="button">Small 28</button>
+            <button class="btn btn-primary" type="button">Default 32</button>
+            <button class="btn btn-primary btn-lg" type="button">Large 40</button>
+            <button class="btn btn-outline btn-icon" type="button" aria-label="More actions"><svg class="i" aria-hidden="true"><use href="#i-more_horiz"/></svg></button>
+            <button class="btn btn-outline" type="button"><svg class="i" aria-hidden="true"><use href="#i-download"/></svg>Export</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Choices</h3></div>
+        <div class="card-body">
+          <div class="row" style="gap:18px">
+            <label class="choice"><input class="check" type="checkbox" id="c-sms" checked>SMS to parents</label>
+            <label class="choice"><input class="check" type="checkbox" id="c-wa">WhatsApp</label>
+            <label class="choice"><input class="switch" type="checkbox" id="c-fine" checked>Late fine</label>
+          </div>
+          <div class="row" style="gap:18px">
+            <label class="choice"><input class="radio" type="radio" name="medium" id="r-en" checked>English medium</label>
+            <label class="choice"><input class="radio" type="radio" name="medium" id="r-ur">Urdu medium</label>
+          </div>
+          <div class="row">
+            <span class="avatar">AK</span><span class="avatar" style="background:var(--primary);color:var(--primary-foreground)">MH</span><span class="avatar" style="background:var(--muted);color:var(--foreground)">+4</span>
+            <span class="tip">Collected by Sana Ahmed</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Tabs and messages</h3></div>
+        <div class="card-body">
+          <div class="tabs" role="tablist" aria-label="Student record" data-tabs>
+            <button class="tab" role="tab" type="button" aria-selected="true">Profile</button>
+            <button class="tab" role="tab" type="button" aria-selected="false">Attendance</button>
+            <button class="tab" role="tab" type="button" aria-selected="false">Fees</button>
+            <button class="tab" role="tab" type="button" aria-selected="false">Results</button>
+          </div>
+          <div class="note success"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg><div><b>Payment recorded</b><p>Rs 8,500 received in cash. Receipt R-2610-0931 is ready to print.</p></div></div>
+          <div class="note warning"><svg class="i" aria-hidden="true"><use href="#i-warning"/></svg><div><b>You are offline</b><p>3 attendance records are saved on this device and will sync when the internet returns.</p></div></div>
+          <div class="note danger"><svg class="i" aria-hidden="true"><use href="#i-error"/></svg><div><b>Voucher was changed by someone else</b><p>Reload the page to see the latest amount, then try again.</p></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Dialog</h3></div>
+        <div class="card-body">
+          <div class="dialog" role="group" aria-label="Collect fee dialog example">
+            <header><h4>Collect fee</h4><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Close"><svg class="i i-sm" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+            <div class="body">
+              <p class="t-ui">Muhammad Hamza, Grade 10-A. Balance <b class="num">Rs 4,800</b> on voucher <span class="code">FV-2610-0413</span>.</p>
+              <div class="form-grid">
+                <div class="field"><label class="label" for="d-amount">Amount received (Rs)</label><input class="input num" id="d-amount" value="4,800" inputmode="numeric"></div>
+                <div class="field"><label class="label" for="d-method">Method</label><label class="select-wrap"><select class="select" id="d-method"><option>Cash</option><option>JazzCash</option><option>Easypaisa</option><option>Bank challan</option></select><svg class="i" aria-hidden="true"><use href="#i-expand_more"/></svg></label></div>
+              </div>
+            </div>
+            <footer><button class="btn btn-outline" type="button">Cancel</button><button class="btn btn-primary" type="button">Record Rs 4,800</button></footer>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Form</h3></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field"><label class="label" for="f-name">Student name</label><input class="input" id="f-name" value="Ayesha Imran"></div>
+            <div class="field"><label class="label" for="f-class">Class</label><label class="select-wrap"><select class="select" id="f-class"><option>Grade 8-B</option><option>Grade 8-A</option></select><svg class="i" aria-hidden="true"><use href="#i-expand_more"/></svg></label></div>
+            <div class="field"><label class="label" for="f-bform">B-Form number</label><input class="input code" id="f-bform" value="35202-12345" aria-invalid="true" aria-describedby="f-bform-hint"><span class="hint error" id="f-bform-hint">Use the format 12345-1234567-1</span></div>
+            <div class="field"><label class="label" for="f-dob">Date of birth</label><input class="input" id="f-dob" type="date" value="2013-03-14"><span class="hint">As written on the B-Form</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Things that float</h3><span class="muted" style="font-size:12px">The only place a shadow is used</span></div>
+        <div class="card-body">
+          <div class="row" style="align-items:flex-start;gap:16px">
+            <div class="menu" role="menu" aria-label="Voucher actions">
+              <button type="button" role="menuitem" class="hover"><svg class="i i-sm" aria-hidden="true"><use href="#i-payments"/></svg>Collect fee<kbd>C</kbd></button>
+              <button type="button" role="menuitem"><svg class="i i-sm" aria-hidden="true"><use href="#i-print"/></svg>Print challan<kbd>P</kbd></button>
+              <button type="button" role="menuitem"><svg class="i i-sm" aria-hidden="true"><use href="#i-notifications"/></svg>Send reminder</button>
+              <hr>
+              <button type="button" role="menuitem" class="danger"><svg class="i i-sm" aria-hidden="true"><use href="#i-close"/></svg>Cancel voucher</button>
+            </div>
+            <div class="toast" role="status"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Reminder sent to 87 parents<button class="btn btn-ghost btn-sm" type="button">Undo</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Fee collected, last 6 months</h3><span class="muted" style="font-size:12px">Rs million, Main Campus</span></div>
+        <div class="card-body"><div class="chart" id="chart-fees"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Attendance, last 14 school days</h3><span class="muted" style="font-size:12px">Percent present</span></div>
+        <div class="card-body">
+          <div class="legend"><span><i style="background:var(--chart-1)"></i>Grades 1 to 5</span><span><i style="background:var(--chart-2)"></i>Grades 6 to 10</span></div>
+          <div class="chart" id="chart-attendance"></div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-head"><h3>October vouchers by status</h3><span class="muted num" style="font-size:12px">1,248 vouchers</span></div>
+        <div class="card-body">
+          <div class="stack" role="img" aria-label="912 paid, 96 partial, 153 unpaid, 87 overdue">
+            <i style="flex:912;background:var(--success)"></i><i style="flex:96;background:var(--warning)"></i><i style="flex:153;background:var(--input)"></i><i style="flex:87;background:var(--danger)"></i>
+          </div>
+          <div class="row" style="gap:10px 18px">
+            <span class="badge success">Paid <b class="num">912</b></span>
+            <span class="badge warning">Partial <b class="num">96</b></span>
+            <span class="badge">Unpaid <b class="num">153</b></span>
+            <span class="badge danger">Overdue <b class="num">87</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="rules">
+    <div class="section-head">
+      <p class="label">Layout rules</p>
+      <h2>What every screen follows</h2>
+      <p>Taken from your two references: hairline borders, capital micro-labels, compact toolbars, a filled table header and tinted badges. Corners are square on everything.</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <table class="rules">
+          <tr><th>Corners</th><td>0 on buttons, inputs, cards, badges, avatars, switches and chart bars</td></tr>
+          <tr><th>Lines</th><td>1px. Structure comes from lines, never from shadows</td></tr>
+          <tr><th>Shadows</th><td>Only on menus, dialogs and toasts</td></tr>
+          <tr><th>Controls</th><td>28, 32 or 40px high. 32 is the default</td></tr>
+          <tr><th>Tables</th><td>36px header, 40px rows (32 compact, 48 comfortable), 12px cell padding, numbers right-aligned</td></tr>
+          <tr><th>Sidebar</th><td>208px wide, 32px items, 56px when collapsed</td></tr>
+          <tr><th>Page</th><td>20px padding, 16px between blocks, cards padded 16px</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <table class="rules">
+          <tr><th>Labels</th><td>11px, capitals, letter-spaced, above the field</td></tr>
+          <tr><th>Focus</th><td>2px ring with a 2px gap, on every control</td></tr>
+          <tr><th>Icons</th><td>Material Symbols Sharp, 18px, the square-cornered set used on this page</td></tr>
+          <tr><th>Radio</th><td>A diamond, so it never looks like a checkbox</td></tr>
+          <tr><th>Codes</th><td>Admission, roll, B-Form and voucher numbers in the mono face</td></tr>
+          <tr><th>Urdu</th><td>Nastaliq, set larger with a line height of 2.1, right to left</td></tr>
+          <tr><th>Dates</th><td>10 Oct 2026 in tables, never 10/10/26</td></tr>
+        </table>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <div class="card-head"><h3>Spacing scale</h3><span class="muted" style="font-size:12px">Every gap and padding is one of these</span></div>
+        <div class="card-body">
+          <div class="scale">
+            <figure><i style="width:4px"></i>4</figure><figure><i style="width:8px"></i>8</figure><figure><i style="width:12px"></i>12</figure><figure><i style="width:16px"></i>16</figure><figure><i style="width:20px"></i>20</figure><figure><i style="width:24px"></i>24</figure><figure><i style="width:32px"></i>32</figure><figure><i style="width:40px"></i>40</figure><figure><i style="width:48px"></i>48</figure>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="foot">Sample data throughout. The product name and logo are proposals until you confirm them.</p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const body = document.body;
+  const store = {
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch { /* storage is optional */ } },
+  };
+
+  // ----- palette and mode ---------------------------------------------------------------------------
+  const darkQuery = matchMedia('(prefers-color-scheme: dark)');
+  const viewerMode = () => root.dataset.theme || (darkQuery.matches ? 'dark' : 'light');
+  let mode = ['light', 'dark'].includes(store.get('kashi-mode')) ? store.get('kashi-mode') : 'auto';
+  let palette = ['kashi', 'sabz', 'siyahi'].includes(store.get('kashi-palette')) ? store.get('kashi-palette') : 'kashi';
+
+  function press(group, attribute, value) {
+    for (const button of group.querySelectorAll('button')) {
+      button.setAttribute('aria-pressed', String(button.dataset[attribute] === value));
+    }
+  }
+
+  function applyTheme() {
+    const effective = mode === 'auto' ? viewerMode() : mode;
+    body.dataset.mode = effective;
+    body.dataset.palette = palette;
+    root.style.colorScheme = effective;
+    press(document.getElementById('mode-ctl'), 'mode', mode);
+    press(document.getElementById('palette-ctl'), 'palette', palette);
+    renderSwatches();
+    renderCharts();
+  }
+
+  document.getElementById('mode-ctl').addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-mode]');
+    if (!button) return;
+    mode = button.dataset.mode;
+    store.set('kashi-mode', mode);
+    applyTheme();
+  });
+  document.getElementById('palette-ctl').addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-palette]');
+    if (!button) return;
+    palette = button.dataset.palette;
+    store.set('kashi-palette', palette);
+    applyTheme();
+  });
+  darkQuery.addEventListener('change', applyTheme);
+  new MutationObserver(applyTheme).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+
+  // ----- small demo behaviours ------------------------------------------------------------------------
+  for (const group of document.querySelectorAll('[data-toggle]')) {
+    group.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      for (const other of group.querySelectorAll('button')) other.setAttribute('aria-pressed', String(other === button));
+    });
+  }
+  for (const list of document.querySelectorAll('[data-tabs]')) {
+    list.addEventListener('click', (event) => {
+      const tab = event.target.closest('.tab');
+      if (!tab) return;
+      for (const other of list.querySelectorAll('.tab')) other.setAttribute('aria-selected', String(other === tab));
+    });
+  }
+  const nameInput = document.getElementById('brand-name');
+  const setName = () => {
+    const name = nameInput.value.trim() || 'Takhti';
+    for (const node of document.querySelectorAll('[data-brand]')) node.textContent = name;
+  };
+  nameInput.addEventListener('input', setName);
+  setName();
+
+  // ----- voucher rows (sample data) --------------------------------------------------------------------
+  const vouchers = [
+    ['FV-2610-0412', 'Ayesha Imran', 'd/o Imran Khan', '8-B', 8500, 8500, '10 Oct', 'Paid', 'success'],
+    ['FV-2610-0413', 'Muhammad Hamza', 's/o Tariq Mehmood', '10-A', 9800, 5000, '10 Oct', 'Partial', 'warning'],
+    ['FV-2610-0414', 'Fatima Noor', 'd/o Noor Ahmed', '3-A', 6200, 0, '10 Oct', 'Unpaid', ''],
+    ['FV-2610-0415', 'Ali Raza', 's/o Raza Hussain', '9-C', 10300, 0, '10 Oct', 'Overdue', 'danger'],
+    ['FV-2610-0416', 'Zainab Ahmed', 'd/o Ahmed Ali', '5-B', 6800, 6800, '10 Oct', 'Paid', 'success'],
+    ['FV-2610-0417', 'Hassan Javed', 's/o Javed Iqbal', '7-A', 8400, 0, '10 Oct', 'Overdue', 'danger'],
+    ['FV-2610-0418', 'Maryam Siddiqui', 'd/o Asif Siddiqui', '1-A', 5500, 11000, '10 Oct', 'Advance', 'info'],
+    ['FV-2610-0419', 'Usman Tariq', 's/o Tariq Aziz', '6-C', 7400, 7400, '10 Oct', 'Paid', 'success'],
+  ];
+  const money = (value) => value.toLocaleString('en-PK');
+  document.getElementById('voucher-rows').innerHTML = vouchers
+    .map(([no, name, parent, klass, billed, paid, due, status, tone], index) => {
+      const balance = Math.max(0, billed - paid);
+      const late = status === 'Overdue';
+      return `<tr${index === 1 ? ' aria-selected="true"' : ''}>
+        <td><input class="check" type="checkbox" id="row-${index}" aria-label="Select ${name}"${index === 1 ? ' checked' : ''}></td>
+        <td class="code">${no}</td>
+        <td><span class="who"><span>${name}</span><small>${parent}</small></span></td>
+        <td>${klass}</td>
+        <td class="r num">${money(billed)}</td>
+        <td class="r num">${money(paid)}</td>
+        <td class="r num"${late ? ' style="font-weight:600"' : ''}>${money(balance)}</td>
+        <td${late ? ' class="late"' : ''}>${due}${late ? ' &middot; 4 days late' : ''}</td>
+        <td><span class="badge ${tone}">${status}</span></td>
+        <td><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Actions for ${name}"><svg class="i i-sm" aria-hidden="true"><use href="#i-more_horiz"/></svg></button></td>
+      </tr>`;
+    })
+    .join('');
+
+  // ----- colour swatches ----------------------------------------------------------------------------------
+  const token = (name) => getComputedStyle(body).getPropertyValue(`--${name}`).trim();
+  function luminance(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+      const c = v / 255;
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+  function ratio(a, b) {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return ((hi + 0.05) / (lo + 0.05)).toFixed(1);
+  }
+  // [token, what it is checked against, shown as "text on X"]
+  const groups = [
+    ['Surfaces and lines', [['background'], ['card'], ['muted'], ['accent'], ['border'], ['input', 'card']]],
+    ['Text', [['foreground', 'card'], ['muted-foreground', 'card'], ['link', 'card'], ['brand-text', 'card']]],
+    ['Brand', [['primary', 'primary-foreground'], ['primary-hover', 'primary-foreground'], ['brand', 'brand-foreground'], ['spark'], ['ring', 'card']]],
+    ['Sidebar and table', [['sidebar', 'sidebar-foreground'], ['sidebar-accent', 'sidebar-accent-foreground'], ['sidebar-border'], ['table-header', 'table-header-foreground'], ['row-hover']]],
+    ['Status', [['success', 'success-subtle'], ['warning', 'warning-subtle'], ['danger', 'danger-subtle'], ['info', 'info-subtle'], ['destructive', 'destructive-foreground']]],
+    ['Charts', [['chart-1'], ['chart-2'], ['chart-3'], ['chart-4'], ['chart-5']]],
+  ];
+  function renderSwatches() {
+    document.getElementById('swatch-groups').innerHTML = groups
+      .map(([title, tokens]) => `<div class="grid" style="gap:8px"><p class="label">${title}</p><div class="swatches">${tokens
+        .map(([name, against]) => {
+          const value = token(name);
+          const pair = against ? `${ratio(value, token(against))}:1 with ${against}` : '&nbsp;';
+          return `<div class="swatch"><i style="background:var(--${name})"></i><div><b>${name}</b><span>${value}</span><span>${pair}</span></div></div>`;
+        })
+        .join('')}</div></div>`)
+      .join('');
+  }
+
+  // ----- charts --------------------------------------------------------------------------------------------
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const el = (name, attrs = {}, text) => {
+    const node = document.createElementNS(svgNS, name);
+    for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, value);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  function tooltipFor(container) {
+    const tip = document.createElement('div');
+    tip.className = 'tooltip';
+    tip.hidden = true;
+    container.append(tip);
+    return {
+      show(html, x, y) {
+        tip.innerHTML = html;
+        tip.hidden = false;
+        const box = container.getBoundingClientRect();
+        const left = Math.min(Math.max(0, x - tip.offsetWidth / 2), box.width - tip.offsetWidth);
+        tip.style.left = `${left}px`;
+        tip.style.top = `${Math.max(0, y - tip.offsetHeight - 10)}px`;
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+
+  function feesChart() {
+    const container = document.getElementById('chart-fees');
+    container.replaceChildren();
+    const data = [['May', 8.9], ['Jun', 6.1], ['Jul', 5.4], ['Aug', 9.2], ['Sep', 9.5], ['Oct', 7.4]];
+    const W = 520, H = 230, left = 30, right = 8, top = 18, bottom = 26;
+    const plotW = W - left - right, plotH = H - top - bottom, max = 10;
+    const y = (value) => top + plotH - (value / max) * plotH;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Fee collected per month in millions of rupees: ' + data.map(([m, v]) => `${m} ${v}`).join(', ') });
+    for (const tick of [0, 2.5, 5, 7.5, 10]) {
+      svg.append(el('line', { class: 'grid', x1: left, x2: W - right, y1: y(tick), y2: y(tick) }));
+      svg.append(el('text', { x: left - 6, y: y(tick) + 4, 'text-anchor': 'end' }, String(tick)));
+    }
+    const tip = tooltipFor(container);
+    const band = plotW / data.length;
+    data.forEach(([month, value], index) => {
+      const cx = left + band * index + band / 2;
+      const bar = el('rect', { x: cx - 12, y: y(value), width: 24, height: y(0) - y(value), fill: 'var(--chart-1)' });
+      svg.append(bar);
+      svg.append(el('text', { class: 'val', x: cx, y: y(value) - 6, 'text-anchor': 'middle' }, value.toFixed(1)));
+      svg.append(el('text', { x: cx, y: H - 8, 'text-anchor': 'middle' }, month));
+      const hit = el('rect', { class: 'hit', x: left + band * index, y: top, width: band, height: plotH, tabindex: 0, 'aria-label': `${month} 2026, Rs ${value.toFixed(1)} million collected` });
+      const show = () => {
+        bar.setAttribute('fill-opacity', '0.8');
+        const scale = container.clientWidth / W;
+        tip.show(`<b>${month} 2026</b><span><i style="background:var(--chart-1)"></i>Rs ${value.toFixed(1)}M collected</span>${month === 'Oct' ? '<span class="muted">Month in progress</span>' : ''}`, cx * scale, y(value) * scale);
+      };
+      const hide = () => { bar.removeAttribute('fill-opacity'); tip.hide(); };
+      hit.addEventListener('pointerenter', show);
+      hit.addEventListener('pointerleave', hide);
+      hit.addEventListener('focus', show);
+      hit.addEventListener('blur', hide);
+      svg.append(hit);
+    });
+    container.prepend(svg);
+  }
+
+  function attendanceChart() {
+    const container = document.getElementById('chart-attendance');
+    container.replaceChildren();
+    const days = ['22 Sep', '23 Sep', '24 Sep', '25 Sep', '26 Sep', '29 Sep', '30 Sep', '1 Oct', '2 Oct', '3 Oct', '6 Oct', '7 Oct', '8 Oct', '9 Oct'];
+    const series = [
+      { name: 'Grades 1 to 5', colour: 'var(--chart-1)', values: [94.1, 93.6, 95.2, 94.8, 92.9, 95.5, 96.1, 95.4, 94.9, 93.8, 95.7, 96.3, 95.9, 96.4] },
+      { name: 'Grades 6 to 10', colour: 'var(--chart-2)', values: [91.2, 90.4, 92.1, 91.5, 88.7, 91.9, 92.8, 92.2, 91.1, 89.6, 92.4, 93.1, 92.7, 93.0] },
+    ];
+    const W = 520, H = 230, left = 34, right = 46, top = 14, bottom = 26;
+    const plotW = W - left - right, plotH = H - top - bottom, min = 85, max = 100;
+    const x = (index) => left + (plotW * index) / (days.length - 1);
+    const y = (value) => top + plotH - ((value - min) / (max - min)) * plotH;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Attendance percent over 14 school days for two grade groups' });
+    for (const tick of [85, 90, 95, 100]) {
+      svg.append(el('line', { class: 'grid', x1: left, x2: W - right, y1: y(tick), y2: y(tick) }));
+      svg.append(el('text', { x: left - 6, y: y(tick) + 4, 'text-anchor': 'end' }, `${tick}%`));
+    }
+    for (const index of [0, 4, 9, 13]) svg.append(el('text', { x: x(index), y: H - 8, 'text-anchor': index === 0 ? 'start' : index === 13 ? 'end' : 'middle' }, days[index]));
+    for (const line of series) {
+      svg.append(el('polyline', { points: line.values.map((value, index) => `${x(index)},${y(value)}`).join(' '), fill: 'none', stroke: line.colour, 'stroke-width': 2, 'stroke-linejoin': 'miter' }));
+      const last = line.values.at(-1);
+      svg.append(el('rect', { x: x(13) - 5, y: y(last) - 5, width: 10, height: 10, fill: line.colour, stroke: 'var(--card)', 'stroke-width': 2 }));
+      svg.append(el('text', { class: 'val', x: x(13) + 10, y: y(last) + 4 }, `${last.toFixed(1)}%`));
+    }
+    const cross = el('line', { class: 'grid', y1: top, y2: top + plotH, stroke: 'var(--border-strong)', visibility: 'hidden' });
+    svg.append(cross);
+    const tip = tooltipFor(container);
+    const hit = el('rect', { class: 'hit', x: left, y: top, width: plotW, height: plotH, tabindex: 0, 'aria-label': 'Attendance chart. Use left and right arrow keys to read each day.' });
+    let active = days.length - 1;
+    const show = (index) => {
+      active = Math.min(days.length - 1, Math.max(0, index));
+      cross.setAttribute('x1', x(active));
+      cross.setAttribute('x2', x(active));
+      cross.setAttribute('visibility', 'visible');
+      const scale = container.clientWidth / W;
+      tip.show(`<b>${days[active]} 2026</b>` + series.map((line) => `<span><i style="background:${line.colour}"></i>${line.name} <b class="num">${line.values[active].toFixed(1)}%</b></span>`).join(''), x(active) * scale, y(Math.max(...series.map((line) => line.values[active]))) * scale);
+    };
+    const hide = () => { cross.setAttribute('visibility', 'hidden'); tip.hide(); };
+    hit.addEventListener('pointermove', (event) => {
+      const box = svg.getBoundingClientRect();
+      const px = ((event.clientX - box.left) / box.width) * W;
+      show(Math.round(((px - left) / plotW) * (days.length - 1)));
+    });
+    hit.addEventListener('pointerleave', hide);
+    hit.addEventListener('focus', () => show(active));
+    hit.addEventListener('blur', hide);
+    hit.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(active - 1);
+      if (event.key === 'ArrowRight') show(active + 1);
+    });
+    svg.append(hit);
+    container.prepend(svg);
+  }
+
+  function renderCharts() { feesChart(); attendanceChart(); }
+
+  applyTheme();
+})();
+</script>

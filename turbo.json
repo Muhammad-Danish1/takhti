@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "stream",
+  "tasks": {
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "inputs": ["src/**", "app/**", "tests/**", "*.ts", "*.tsx", "*.json"],
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  },
+  "agentGuidance": false
+}

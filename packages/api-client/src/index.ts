@@ -1,0 +1,6 @@
+export * from './kernel/client';
+export * from './kernel/crud-api-service';
+export * from './modules/generated';
+export * from './modules/identity/me.api-service';
+export * from './modules/organisation/branches.api-service';
+export * from './modules/organisation/rooms.api-service';

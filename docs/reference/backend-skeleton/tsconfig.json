@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["node"],
+    "paths": {
+      "@school/contracts": ["./packages/contracts/src/index.ts"],
+      "@school/db": ["./packages/db/src/index.ts"],
+      "@school/core": ["./packages/core/src/index.ts"],
+      "@school/api-client": ["./packages/api-client/src/index.ts"],
+      "@school/hooks": ["./packages/hooks/src/index.ts"],
+      "@/*": ["./apps/web/src/*"]
+    }
+  },
+  "include": ["packages", "apps", "tests"]
+}

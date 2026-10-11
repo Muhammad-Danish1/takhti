@@ -1,0 +1,20 @@
+{
+  "name": "@takhti/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The design system: Kashi tokens and components. Filled in Phase 4.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@takhti/config": "workspace:*",
+    "@types/react": "19.3.0",
+    "react": "19.3.0",
+    "typescript": "7.0.2"
+  }
+}
