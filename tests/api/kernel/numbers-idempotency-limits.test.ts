@@ -85,7 +85,7 @@ describe('numbers', () => {
     expect(await as(theirs, (ctx) => nextValue(ctx, 'shared-key'))).toBe(1);
   });
 
-  it('a save that is rolled back gives its number back: no gap is left', async () => {
+  it('T-shared-6 a save that is rolled back gives its number back: no gap is left', async () => {
     const first = await as(cashier, (ctx) => nextValue(ctx, 'voucher'));
     await expect(
       as(cashier, async (ctx) => {
@@ -96,7 +96,7 @@ describe('numbers', () => {
     expect(await as(cashier, (ctx) => nextValue(ctx, 'voucher'))).toBe(first + 1);
   });
 
-  it('50 people saving at the same moment get 50 different, consecutive numbers', async () => {
+  it('T-shared-6 / F-shared-10 50 people saving at the same moment get 50 different, consecutive numbers', async () => {
     const taken = await Promise.all(
       Array.from({ length: 50 }, () => as(cashier, (ctx) => nextValue(ctx, 'busy-counter'))),
     );
@@ -143,7 +143,7 @@ describe('idempotency', () => {
     return { call, runs: () => runs };
   };
 
-  it('a double click runs the work once and returns the same answer twice', async () => {
+  it('T-shared-7 a double click runs the work once and returns the same answer twice', async () => {
     const key = randomUUID();
     const payment = collect(key);
     const first = await payment.call();
@@ -153,7 +153,7 @@ describe('idempotency', () => {
     expect(payment.runs()).toBe(1);
   });
 
-  it('the same key for a different request is refused', async () => {
+  it('T-shared-7 the same key for a different request is refused', async () => {
     const key = randomUUID();
     await collect(key).call();
     const error = await expectError('CONFLICT', () => collect(key, { amount: 99 }).call());
@@ -173,7 +173,7 @@ describe('idempotency', () => {
     expect(retry.replayed).toBe(false);
   });
 
-  it('two identical requests at the same moment: one runs, the other gets its answer', async () => {
+  it('T-shared-7 two identical requests at the same moment: one runs, the other gets its answer', async () => {
     const key = randomUUID();
     const payment = collect(key);
     const [a, b] = await Promise.all([payment.call(), payment.call()]);

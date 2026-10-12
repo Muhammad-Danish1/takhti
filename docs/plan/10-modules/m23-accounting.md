@@ -59,7 +59,7 @@ Unique: (fiscal_year_id, period_no).
 
 | Column | Type | Rules |
 |---|---|---|
-| code | text | required; unique per organisation; `GJ`, `FEE`, `CASH`, `BANK`, `PAY`, `PUR`, `OPEN`, `CLOSE` |
+| code | text | required; unique per organisation; `GJ`, `FEE`, `CASH`, `BANK`, `PAY`, `PUR`, `INV`, `OPEN`, `CLOSE` |
 | name | text | required |
 | kind | enum(general, fees, cash, bank, payroll, purchases, inventory, opening, closing) | required |
 | is_system | bool | default false |
@@ -121,7 +121,7 @@ Which account each automatic posting uses.
 | branch_id | uuid → branches | optional; a branch-specific override |
 | account_id | uuid → accounts | required |
 
-Unique: (key, branch_id).
+Unique: (org_id, key, branch_id).
 
 #### `bank_accounts` · org
 
@@ -179,6 +179,10 @@ ledger.reverse(ctx, { source: { type: 'fee_payment', id }, date, reason });
 ```
 
 It resolves mapping keys to accounts (branch override first), checks that the entry balances overall and per branch, that the period is open, that every account is active and not a group, numbers the entry, and writes entry and lines in the caller's transaction. Calling it again for the same source and purpose returns the existing entry.
+
+A line whose amount is zero is left out, so a caller may list every part of a posting (a discount of nothing, a tax of nothing) without testing each. `ledger.reverseEntry(ctx, entryId, { date, reason })` reverses an entry that has no source, a manual one. The calculations that need no database (what balances, the inter-branch lines, the exchange of debits and credits) are in `ledger.rules.ts`.
+
+**What a new school starts with.** Provisioning an organisation ([M01](m01-platform-console.md)) writes the default chart of accounts, the nine journals (one for each code above), an account for every mapping key, and the fiscal year that contains the day the school is created, with its twelve periods open. So the first fee can be collected and posted without anyone setting up accounting first. The chart is in `packages/db/src/provision/accounting.ts`; a school changes it afterwards like any other data.
 
 **Mapping keys** (seeded with a default chart): `cash.counter`, `cash.petty`, `fees.receivable`, `fees.income` (fallback when a head has no account), `fees.discounts`, `fees.fine_income`, `fees.advance` (family credit), `fees.security_deposit`, `fees.bad_debts`, `fees.rounding`, `cash.over_short`, `gateway.clearing`, `gateway.charges`, `tax.fee_advance_payable`, `tax.salary_payable`, `tax.vendor_withholding_payable`, `payroll.salary_expense`, `payroll.employer_contributions`, `payroll.salaries_payable`, `payroll.eobi_payable`, `payroll.social_security_payable`, `payroll.provident_fund_payable`, `payroll.loans`, `payroll.advances`, `ap.payable`, `ap.advances_to_vendors`, `inventory.asset`, `inventory.consumed`, `inventory.adjustment`, `assets.fixed`, `assets.depreciation_expense`, `assets.accumulated_depreciation`, `shop.sales`, `shop.cost_of_sales`, `shop.wallets`, `bank.charges`, `interbranch.due`, `equity.opening_balance`, `equity.retained_earnings`.
 

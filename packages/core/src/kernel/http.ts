@@ -125,6 +125,48 @@ export interface PublicRouteSpec<P, Q, B, TResult> extends CommonSpec<P, Q, B> {
   handler: (context: PublicRouteContext, input: RouteInput<P, Q, B>) => Awaitable<TResult>;
 }
 
+/**
+ * What a route says about itself. The route manifest (`pnpm api:manifest`) is built from this, and
+ * with it the comparison with the plan and the test that calls every route.
+ */
+export interface RouteMeta {
+  /**
+   * The cell of the plan's route table this route answers to: a permission key, or `signed-in`
+   * (any signed-in person), `public`, `platform` or `webhook`. Undefined when a route for members
+   * of a school names no permission, which the manifest refuses.
+   */
+  access: string | undefined;
+  /** Which builder made it. */
+  caller: 'member' | 'user' | 'platform' | 'public';
+  idempotent: boolean;
+  /** The route's own limit, or `standard` for the limit shared by routes of its kind, or `none`. */
+  rateLimit: RateLimitSpec | 'standard' | 'none';
+}
+
+const ROUTE_META = Symbol.for('takhti.route-meta');
+
+function describe<P, Q, B>(
+  handler: RouteHandler,
+  spec: CommonSpec<P, Q, B>,
+  meta: Pick<RouteMeta, 'access' | 'caller'> & { idempotent?: boolean },
+): RouteHandler {
+  const full: RouteMeta = {
+    access: meta.access,
+    caller: meta.caller,
+    idempotent: meta.idempotent === true,
+    rateLimit:
+      spec.rateLimit === false ? 'none' : spec.rateLimit ? { ...spec.rateLimit } : 'standard',
+  };
+  Object.defineProperty(handler, ROUTE_META, { value: Object.freeze(full) });
+  return handler;
+}
+
+/** What a handler built by `createRoutes` says about itself; undefined for any other function. */
+export function routeMetaOf(handler: unknown): RouteMeta | undefined {
+  if (typeof handler !== 'function') return undefined;
+  return (handler as unknown as Record<symbol, RouteMeta | undefined>)[ROUTE_META];
+}
+
 export interface MemberSession {
   actor: Actor;
   /** True when the caller proved itself with a bearer token rather than the browser's cookie. */
@@ -294,7 +336,7 @@ export function createRoutes(deps: RouteDeps) {
     B extends z.ZodType | undefined = undefined,
     TResult = unknown,
   >(spec: RouteSpec<P, Q, B, TResult>): RouteHandler {
-    return async (request, context) => {
+    const handler: RouteHandler = async (request, context) => {
       const requestId = incomingRequestId(request);
       try {
         const session = await deps.authenticate(request);
@@ -402,6 +444,11 @@ export function createRoutes(deps: RouteDeps) {
         return fail(error, requestId, request);
       }
     };
+    return describe(handler, spec, {
+      access: spec.permission,
+      caller: 'member',
+      idempotent: spec.idempotent === true,
+    });
   }
 
   /** A route for a signed-in person who has no school chosen yet. The handler opens its own unit of work if it needs one. */
@@ -411,7 +458,7 @@ export function createRoutes(deps: RouteDeps) {
     B extends z.ZodType | undefined = undefined,
     TResult = unknown,
   >(spec: UserRouteSpec<P, Q, B, TResult>): RouteHandler {
-    return async (request, context) => {
+    const handler: RouteHandler = async (request, context) => {
       const requestId = incomingRequestId(request);
       try {
         if (!deps.authenticateUser) throw new Error('This app has no authenticateUser');
@@ -436,6 +483,7 @@ export function createRoutes(deps: RouteDeps) {
         return fail(error, requestId, request);
       }
     };
+    return describe(handler, spec, { access: SIGNED_IN, caller: 'user' });
   }
 
   /** A route for Takhti's own staff. Runs on the privileged connection and is always recorded. */
@@ -445,7 +493,7 @@ export function createRoutes(deps: RouteDeps) {
     B extends z.ZodType | undefined = undefined,
     TResult = unknown,
   >(spec: PlatformRouteSpec<P, Q, B, TResult>): RouteHandler {
-    return async (request, context) => {
+    const handler: RouteHandler = async (request, context) => {
       const requestId = incomingRequestId(request);
       try {
         if (!deps.authenticatePlatform || !deps.runPlatform)
@@ -483,6 +531,7 @@ export function createRoutes(deps: RouteDeps) {
         return fail(error, requestId, request);
       }
     };
+    return describe(handler, spec, { access: 'platform', caller: 'platform' });
   }
 
   /** A route with no session: a public page or form, or a webhook. Always limited by address. */
@@ -492,7 +541,7 @@ export function createRoutes(deps: RouteDeps) {
     B extends z.ZodType | undefined = undefined,
     TResult = unknown,
   >(spec: PublicRouteSpec<P, Q, B, TResult>): RouteHandler {
-    return async (request, context) => {
+    const handler: RouteHandler = async (request, context) => {
       const requestId = incomingRequestId(request);
       try {
         if (spec.kind === 'page') assertSameOrigin(request, deps.allowedOrigins(), false);
@@ -520,6 +569,10 @@ export function createRoutes(deps: RouteDeps) {
         return fail(error, requestId, request);
       }
     };
+    return describe(handler, spec, {
+      access: spec.kind === 'webhook' ? 'webhook' : 'public',
+      caller: 'public',
+    });
   }
 
   // In the builders below the contract is generic, so TypeScript cannot see that a value parsed by
@@ -537,6 +590,7 @@ export function createRoutes(deps: RouteDeps) {
         permission: service.permissions.create || undefined,
         body: contract.create,
         status: 201,
+        idempotent: contract.idempotentCreate === true,
         handler: (ctx, { body }) => service.create(ctx, body as CreateData<R>),
       }),
     };

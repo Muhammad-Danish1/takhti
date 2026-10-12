@@ -131,6 +131,7 @@ export const stockLevels = defineTable(
       .references((): AnyPgColumn => inventoryItems.id)
       .notNull(),
     quantity: decimal(12, 3).notNull().default(0),
+    /** the quantity at the item's average cost */
     value: paisa().notNull().default(0),
   },
   (t) => [

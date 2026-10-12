@@ -1,0 +1,1 @@
+CREATE POLICY "jobs_update" ON "jobs" AS PERMISSIVE FOR UPDATE TO "authenticated" USING ("jobs"."org_id" = (select app.org_id()) and (select app.is_staff())) WITH CHECK ("jobs"."org_id" = (select app.org_id()) and (select app.is_staff()));

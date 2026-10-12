@@ -46,6 +46,7 @@ const moduleFiles = readdirSync(modulesDir).filter((f) => /^m\d\d-.*\.md$/.test(
 const tables = new Map();       // name → { module, file, scope, mods, columns: [{ name, type, rules }] }
 const permissions = new Map();  // key → { module, file, allows, roles }
 const routes = [];              // { module, file, method, path, permission, does }
+const idempotentRoutes = [];    // { file, method, path }: routes a spec says need an Idempotency-Key
 const ids = new Map();          // 'R-fees-1' → file
 const events = [];              // { module, file, key }
 const jobs = [];                // { module, file, key, when }
@@ -137,6 +138,14 @@ for (const file of moduleFiles) {
       continue;
     }
 
+    // ---- "Idempotent: `POST /fee-payments`, …" under the route table. A path alone is a POST.
+    if (/^Idempotent\b[^:]*:/.test(line)) {
+      for (const m of line.matchAll(/`(?:(GET|POST|PUT|PATCH|DELETE) )?(\/[^`\s]+)`/g)) {
+        idempotentRoutes.push({ file, method: m[1] ?? 'POST', path: m[2] });
+      }
+      continue;
+    }
+
     // ---- rule, failure and test ids
     const idm = line.match(/^- \*\*([RFT]-[a-z]+-\d+[a-z]?)\*\*/);
     if (idm) {
@@ -199,6 +208,14 @@ for (const r of routes) {
   if (!ACCESS_WORDS.includes(r.permission) && !permissions.has(r.permission)) {
     err(r.file, `route ${key} uses permission "${r.permission}", which no module defines`);
   }
+}
+
+const idempotentKeys = new Set();
+for (const r of idempotentRoutes) {
+  const key = `${r.method} ${r.path}`;
+  if (!routeKeys.has(key)) err(r.file, `"Idempotent:" names ${key}, which is not in a route table`);
+  else if (routeKeys.get(key) !== r.file) err(r.file, `"Idempotent:" names ${key}, a route of ${routeKeys.get(key)}`);
+  idempotentKeys.add(key);
 }
 
 const usedPermissions = new Set(routes.map((r) => r.permission));
@@ -376,7 +393,10 @@ if (process.argv.includes('--json')) {
       columns: t.columns.map((c) => ({ name: c.name, type: c.type })),
     })),
     permissions: [...permissions.entries()].map(([key, p]) => ({ key, module: p.module, roles: p.roles })),
-    routes: routes.map((r) => ({ method: r.method, path: r.path, permission: r.permission, module: r.module })),
+    routes: routes.map((r) => ({
+      method: r.method, path: r.path, permission: r.permission, module: r.module,
+      ...(idempotentKeys.has(`${r.method} ${r.path}`) && { idempotent: true }),
+    })),
     events: [...eventKeys.keys()].sort(),
     jobs: [...jobKeys.keys()].sort(),
     settings: [...new Set(settings.map((x) => x.key))].sort(),
@@ -392,7 +412,7 @@ console.log(`modules      ${moduleFiles.length}`);
 console.log(`tables       ${tables.size}`);
 console.log(`columns      ${[...tables.values()].reduce((n, t) => n + t.columns.length, 0)}`);
 console.log(`permissions  ${permissions.size}`);
-console.log(`routes       ${routes.length}`);
+console.log(`routes       ${routes.length} (${idempotentKeys.size} idempotent)`);
 console.log(`rules        ${count(/^R-/)}`);
 console.log(`failures     ${count(/^F-/)}`);
 console.log(`tests        ${count(/^T-/)}`);

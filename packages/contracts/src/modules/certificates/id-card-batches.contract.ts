@@ -43,4 +43,5 @@ export const idCardBatchesContract = defineResource({
   create: CreateIdCardBatch,
   update: UpdateIdCardBatch,
   list: ListIdCardBatches,
+  idempotentCreate: true,
 });

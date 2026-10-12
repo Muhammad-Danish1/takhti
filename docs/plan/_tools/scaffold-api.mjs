@@ -99,6 +99,14 @@ function routesOf(spec) {
       });
     }
   }
+  // "Idempotent: `POST /fee-payments`, …" under the route table. A path alone is a POST.
+  const idempotent = new Set();
+  for (const line of lines) {
+    if (!/^Idempotent\b[^:]*:/.test(line)) continue;
+    for (const match of line.matchAll(/`(?:(GET|POST|PUT|PATCH|DELETE) )?(\/[^`\s]+)`/g))
+      idempotent.add(`${match[1] ?? 'POST'} ${match[2]}`);
+  }
+  for (const route of routes) route.idempotent = idempotent.has(`${route.method} ${route.path}`);
   return routes;
 }
 
@@ -470,6 +478,10 @@ function contractCode(resource, names, columns, inputs, list) {
     `  create: ${names.create},\n` +
     `  update: ${names.update},\n` +
     `  list: ${names.list},\n` +
+    // The plan says adding one must not happen twice: the route then asks for an Idempotency-Key.
+    (inputs.create && resource.routes.some((route) => route.operation === 'create' && route.idempotent)
+      ? `  idempotentCreate: true,\n`
+      : '') +
     `});\n`;
   const usedPrimitives = primitives.filter((name) => uses(body, name));
   const usesShape = /(?<![\w.])shape\./.test(body.replace(`const shape = ${names.entity}.shape;`, ''));

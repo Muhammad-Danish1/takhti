@@ -28,7 +28,8 @@ export function createApiService<R extends AnyResource>(contract: R): ApiService
     list: (params, signal) =>
       api.get(path, { query: params as Record<string, unknown> | undefined, signal }),
     get: (id, signal) => api.get(`${path}/${id}`, { signal }),
-    create: (input) => api.post(path, { body: input }),
+    create: (input) =>
+      api.post(path, { body: input, idempotent: contract.idempotentCreate === true }),
     update: (id, input) => api.patch(`${path}/${id}`, { body: input }),
     remove: (id) => api.delete(`${path}/${id}`),
     restore: (id) => api.post(`${path}/${id}/restore`),

@@ -95,10 +95,10 @@ describe('rooms: create, read, list, update, delete', () => {
     });
 
     expect((await remove(principal, created.data.id)).status).toBe(204);
-    expect(
-      (await callRoute(item.GET, { as: principal, url: '/x', params: { id: created.data.id } }))
-        .status,
-    ).toBe(404);
+    expect((await list(principal)).data.items.map((room) => room.id)).not.toContain(
+      created.data.id,
+    );
+    expect((await patch(principal, created.data.id, { version: 2, capacity: 30 })).status).toBe(404);
     // Soft delete: the row is still there, marked, so history and offline devices can learn it is gone.
     const [row] = await adminDb().select().from(rooms).where(eq(rooms.id, created.data.id));
     expect(row?.deletedAt).not.toBeNull();

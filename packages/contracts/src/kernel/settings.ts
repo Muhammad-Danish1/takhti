@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+import type { PermissionKey } from '../catalogue';
 
 /*
  * A typed registry of settings. A setting that is not registered cannot be read or written.
@@ -18,6 +19,17 @@ export interface SettingDef<T = unknown> {
   labelUr?: string;
   /** Shown under the field on the settings screen. */
   hint?: string;
+  /**
+   * The permission needed to change it. Left out: `org-settings:update` for the group's value and
+   * `branch-settings:update` for a branch's own. A module's settings name that module's permission.
+   */
+  permission?: PermissionKey;
+  /**
+   * Who may read it through the API. `staff` (the default): every member of staff, because any
+   * screen may depend on it. `member`: families too, for a setting that shapes what they see.
+   * A permission: only its holders, for a setting that is nobody else's business.
+   */
+  readableBy?: 'staff' | 'member' | PermissionKey;
 }
 
 export function defineSetting<T>(def: SettingDef<T>): SettingDef<T> {

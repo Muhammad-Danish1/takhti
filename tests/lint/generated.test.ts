@@ -78,6 +78,43 @@ describe('generated files', () => {
     expect(output).toMatch(/up to date/);
   }, 180_000);
 
+  it('the routes in code are routes of the plan, with the planned permission (`pnpm api:verify-plan`)', () => {
+    let output = '';
+    let failed = false;
+    try {
+      // The manifest it reads is held to the route files by tests/api/security/routes.generated.test.ts.
+      output = execFileSync(
+        process.execPath,
+        ['--import', 'tsx', join(root, 'apps/web/scripts/api-verify-plan.ts')],
+        { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    } catch (error) {
+      failed = true;
+      const caught = error as { stdout?: string; stderr?: string };
+      output = `${caught.stdout ?? ''}${caught.stderr ?? ''}`;
+    }
+    expect(failed, output).toBe(false);
+    expect(output).toMatch(/match the plan/);
+  }, 120_000);
+
+  it('a test named after a rule names a rule the plan has (`pnpm plan:coverage`)', () => {
+    let output = '';
+    let failed = false;
+    try {
+      output = execFileSync(process.execPath, [join(root, 'docs/plan/_tools/coverage.mjs')], {
+        cwd: root,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (error) {
+      failed = true;
+      const caught = error as { stdout?: string; stderr?: string };
+      output = `${caught.stdout ?? ''}${caught.stderr ?? ''}`;
+    }
+    expect(failed, output).toBe(false);
+    expect(output).toMatch(/Named tests exist for/);
+  }, 120_000);
+
   it('every statement Drizzle cannot express is part of a migration (run `pnpm db:custom-sql <wave>` after generating)', () => {
     const customDir = join(root, 'packages/db/src/custom-sql');
     const migrationsDir = join(root, 'packages/db/migrations');

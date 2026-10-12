@@ -58,7 +58,7 @@ The quantity of an item in a store. Kept in step with movements inside the same 
 | warehouse_id | uuid → warehouses | required |
 | item_id | uuid → inventory_items | required |
 | quantity | numeric(12,3) | default 0; never below zero |
-| value | paisa | default 0 |
+| value | paisa | default 0; the quantity at the item's average cost |
 
 Unique: (warehouse_id, item_id).
 
@@ -241,6 +241,23 @@ Where an asset has been and who held it.
 - `CustodianList`: everything a staff member holds.
 
 One service owns stock: `packages/core/src/modules/inventory/stock.ts` — `stock.move(ctx, { warehouseId, itemId, kind, quantity, unitCost?, source })`. It locks the stock level row, refuses to go below zero, updates the weighted average cost on a receipt, writes the movement and the level, and posts to the ledger. Nothing else writes these tables.
+
+The caller gives the quantity as a plain amount; the kind says which way it goes (a `count_adjustment` alone is signed: more found is positive). A movement out is costed at the item's average at that moment, whatever the caller passes. A movement in is costed at the price given, or at the average when none is. A source that has moved an item once is not moved again: the second call returns the first movement. The arithmetic (quantities to three decimals, value, the weighted average) is in `stock.rules.ts`.
+
+**What a movement posts**, in the `INV` journal, dated the day it moved, in the store's branch:
+
+| Kind | Entry |
+|---|---|
+| `issue` | Debit `inventory.consumed` (with the cost center, when given), credit `inventory.asset` |
+| `write_off` | Debit `inventory.adjustment`, credit `inventory.asset` |
+| `count_adjustment` | More found: debit `inventory.asset`, credit `inventory.adjustment`. Less found: the reverse |
+| `receipt` | Debit `inventory.asset`, credit the account the caller names: what is owed to the vendor for goods received, `inventory.adjustment` for a donation. With no account named, nothing is posted |
+| `return_to_vendor` | Debit the account the caller names, credit `inventory.asset`. With none named, nothing is posted |
+| `opening` | Nothing: opening stock is part of the opening balances entry, with which it must agree (R-inventory-11) |
+| `transfer_out`, `transfer_in` | Nothing: a transfer posts once, when it is received, from the transfer service |
+| `sale`, `sale_return` | Nothing: the shop posts one entry for the whole sale, with its cost of sales |
+
+A caller that posts an entry of its own for the whole operation passes `ledger: false`. A movement worth nothing (an item with no cost yet) posts nothing.
 
 Settings: `inventory.allow_negative` (default false), `inventory.issue_approval` (default true), `inventory.count_approval_above` (default Rs 5,000 of difference), `assets.capitalise_above` (default Rs 25,000; a purchase line above this prompts "record as an asset"), `assets.depreciation_frequency` (`monthly` | `yearly`, default monthly).
 

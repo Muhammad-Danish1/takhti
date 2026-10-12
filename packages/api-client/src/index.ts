@@ -4,3 +4,6 @@ export * from './modules/generated';
 export * from './modules/identity/me.api-service';
 export * from './modules/organisation/branches.api-service';
 export * from './modules/organisation/rooms.api-service';
+export * from './modules/organisation/wings.api-service';
+export * from './modules/shared/approval-policies.api-service';
+export * from './modules/shared/custom-fields.api-service';

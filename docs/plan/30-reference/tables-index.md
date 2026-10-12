@@ -419,7 +419,7 @@
 | `webhook_endpoints` | [M05](../10-modules/m05-integrations-api.md) | org | 7 |
 | `webhook_events` | [M05](../10-modules/m05-integrations-api.md) | platform | 10 |
 | `whatsapp_templates` | [M37](../10-modules/m37-messaging-hub.md) | org | 9 |
-| `wings` | [M02](../10-modules/m02-organisation-branches.md) | branch | 5 |
+| `wings` | [M02](../10-modules/m02-organisation-branches.md) | branch | 6 |
 | `withholding_certificates` | [M25](../10-modules/m25-tax-compliance.md) | org +self | 11 |
 | `work_schedules` | [M27](../10-modules/m27-staff-attendance-leave.md) | org | 10 |
 

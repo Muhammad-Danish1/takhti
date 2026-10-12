@@ -8,7 +8,12 @@ import {
   uuid,
   type AnyPgColumn,
 } from 'drizzle-orm/pg-core';
-import { onboardingStatuses, onboardingTaskKeys, roomKinds } from '@takhti/contracts';
+import {
+  genderPolicies,
+  onboardingStatuses,
+  onboardingTaskKeys,
+  roomKinds,
+} from '@takhti/contracts';
 import { baseColumns, branchIdColumn } from '../../kernel/base-columns';
 import {
   between,
@@ -74,9 +79,12 @@ export const wings = table(
     nameUr: text(),
     gradeFrom: integer().notNull(),
     gradeTo: integer().notNull(),
+    /** A boys' wing and a girls' wing may cover the same grades. */
+    gender: enumText(genderPolicies).notNull().default('mixed'),
     headStaffId: uuid().references((): AnyPgColumn => staff.id),
   },
   (t) => [
+    ...enumChecks('wings', t),
     between('wings', t.gradeFrom, 1, 10),
     between('wings', t.gradeTo, 1, 10),
     uniqueIndex('wings_name_uq').on(t.branchId, t.name).where(live(t)),

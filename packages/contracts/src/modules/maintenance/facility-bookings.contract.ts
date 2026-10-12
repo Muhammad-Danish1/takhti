@@ -49,4 +49,5 @@ export const facilityBookingsContract = defineResource({
   create: CreateFacilityBooking,
   update: UpdateFacilityBooking,
   list: ListFacilityBookings,
+  idempotentCreate: true,
 });

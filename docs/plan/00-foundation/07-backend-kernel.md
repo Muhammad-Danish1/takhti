@@ -228,7 +228,9 @@ Tests: 50 parallel callers get 50 different consecutive numbers; a rollback leav
 
 ### `scope.ts` — new
 
-`branchFilter(ctx, column)`, `teacherSectionIds(ctx)`, `wingGradeIds(ctx)`, `assertOwnStudent(ctx, studentId)`, `assertBranch(ctx, branchId)`, `assertNotSelf(ctx, userId)`.
+`branchFilter(ctx, column)`, `assertOwnStudent(ctx, studentId)`, `assertBranch(ctx, branchId)`, `assertNotSelf(ctx, userId)`.
+
+`teacherSectionIds(ctx)`, `wingGradeIds(ctx)` and `enrollmentReach(ctx)` read the academic tables, so they are in `packages/core/src/modules/academics/scope.ts`. Each answers `null` (or no condition) for a person who is not limited: a person is limited to their sections only when every role they hold is a teaching role, and to their wing only when they are a section head holding nothing wider. A school's own custom role counts as wider.
 
 ### `state-machine.ts` — new
 

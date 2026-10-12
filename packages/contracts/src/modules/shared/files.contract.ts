@@ -118,6 +118,13 @@ export const CreateUpload = z.object({
 });
 export type CreateUpload = z.output<typeof CreateUpload>;
 
+/**
+ * The answer of `POST /files/[id]/confirm`: the file is ready to use, or it was quarantined because
+ * what arrived was empty, too large or not the kind of file that was announced.
+ */
+export type ConfirmedUpload =
+  { id: string; status: 'ready' } | { id: string; status: 'quarantined'; reason: string };
+
 /** What the client gets back: where to send the bytes, and until when. */
 export interface UploadTicket {
   fileId: string;

@@ -92,6 +92,7 @@ A part of a campus with its own head: Primary, Middle, Secondary, or Boys and Gi
 | name_ur | text | optional |
 | grade_from | int | required; 1 to 10 |
 | grade_to | int | required; ≥ `grade_from` |
+| gender | enum(boys, girls, mixed) | default mixed |
 | head_staff_id | uuid → staff | optional |
 
 Unique: (branch_id, name) among live rows.
@@ -126,6 +127,8 @@ Unique: (org_id, key).
 
 - `UpdateOrg` cannot change `slug` or `status` (platform only).
 - `Setting` values are parsed by the registered schema for their key.
+- A registered setting also states who may change it (`permission`; left out, it is `org-settings:update`, and `branch-settings:update` for a branch's own value) and who may read it through the API (`readableBy`: `staff`, the default; `member`, for the settings that shape a family's screens; or a permission). `SettingView` is `{ key, scope, label, value, defaultValue, source, canChange }`.
+- `GET /org/settings/[key]` takes an optional `branchId` and answers with the value in force there. Staff are told a branch's own values only at a branch they work at (row-level security shows them no other branch's rows), so asking about another branch is refused rather than answered with the group's value; a family may ask about any branch.
 - `settings.ts` in this folder registers the organisation-wide keys that belong to no other module: `general.languages`, `general.number_formats`, `general.working_week`, `security.password_policy`, `security.mfa_roles`, `security.session_hours`, `documents.letterhead`, `documents.signatures`.
 
 ## 5 · Rules
@@ -136,11 +139,11 @@ Unique: (org_id, key).
 - **R-org-4** A group always has at least one active branch.
 - **R-org-5** A branch with active students or open vouchers cannot be deactivated. The message says how many students and vouchers block it.
 - **R-org-6** An inactive branch is read-only. Its history, reports and documents remain available.
-- **R-org-7** Changing `billing_mode` is allowed only when no voucher is open for the current period.
-- **R-org-8** Changing `academic_year_start_month` or `fiscal_year_start_month` is refused once a year of that kind exists; later years are edited in [M04](m04-school-setup.md).
-- **R-org-9** A wing's grade range must not overlap another wing of the same branch unless both carry a different gender.
+- **R-org-7** Changing `billing_mode` is allowed only when no voucher is open for the current period: none of this month's vouchers is unpaid or part-paid. The fees module answers the question (`registerBillingModeBlocker`), and the message says how many vouchers block it.
+- **R-org-8** Changing `academic_year_start_month` is refused once an academic year exists; later years are edited in [M04](m04-school-setup.md). Changing `fiscal_year_start_month` is refused once the fiscal year has been used: it has a journal entry, a closed period, or a second year beside it. A new school is given its first fiscal year when it is created ([M23](m23-accounting.md)); while that year is untouched, changing the month rebuilds the year and its twelve periods around today.
+- **R-org-9** A wing's grade range must not overlap another wing of the same branch, unless one is for boys and the other for girls.
 - **R-org-10** A room in use by a section, a timetable entry or a future booking cannot be deleted.
-- **R-org-11** New branches copy the group's defaults: working week, bell schedule template, and optionally last year's fee structures.
+- **R-org-11** New branches copy the group's defaults: working week, bell schedule template, and optionally last year's fee structures. The working week needs no copying: a branch without a value of its own has the group's (R-org-2). For the rest, `POST /branches` takes `copyBellSchedule` (default yes) and `copyFeeStructuresFrom` (a branch of the group, optional), and `branch.created` carries them; the timetable and fees modules subscribe and do their own copying.
 
 ## 6 · Permissions
 
@@ -249,5 +252,5 @@ Organisation "Roshan Public School" (slug `roshan`), Lahore, Punjab, academic ye
 - **T-org-5** An inactive branch refuses writes in a branch-scoped module.
 - **T-org-6** Wing overlap rule.
 - **T-org-7** Room in use cannot be deleted.
-- **T-org-8** A guardian can read `/org/public` and nothing else in this module.
+- **T-org-8** A guardian can read `/org/public` and the settings marked for families, and nothing else in this module.
 - **T-org-9** Row-level security: staff of another organisation cannot read `orgs`, `branches`, settings, wings or rooms.

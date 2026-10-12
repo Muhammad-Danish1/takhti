@@ -151,7 +151,7 @@ describe('files', () => {
     );
   });
 
-  it('a file larger than promised is removed and refused when it is confirmed', async () => {
+  it('T-shared-2 a file larger than its purpose allows is removed and quarantined when it is confirmed', async () => {
     const ticket = await as(principal, (ctx) =>
       createUpload(ctx, {
         purpose: 'photo',
@@ -161,13 +161,17 @@ describe('files', () => {
       }),
     );
     await uploadBytes(ticket.fileId, new Uint8Array(3 * 1024 * 1024), 'image/jpeg'); // the limit for a photo is 2 MB
-    await expectError('VALIDATION', () =>
-      as(principal, (ctx) => confirmUpload(ctx, ticket.fileId)),
-    );
+    // An answer, not an error: an error would roll back the mark that records the quarantine.
+    expect(await as(principal, (ctx) => confirmUpload(ctx, ticket.fileId))).toEqual({
+      id: ticket.fileId,
+      status: 'quarantined',
+      reason: 'The file is larger than allowed',
+    });
     const [row] = await adminDb().select().from(files).where(eq(files.id, ticket.fileId));
-    // The refusal rolled the request back, so the row is still pending; the oversized bytes are gone.
-    expect(row?.status).toBe('pending');
+    expect(row?.status).toBe('quarantined');
     expect(await store.stat(row!.bucket, row!.path)).toBeNull();
+    // Quarantined for good: it can be neither confirmed again nor used.
+    await expectError('RULE', () => as(principal, (ctx) => confirmUpload(ctx, ticket.fileId)));
   });
 
   it('only the uploader can confirm their upload; a file name with odd characters is kept safe', async () => {
@@ -360,6 +364,50 @@ describe('approvals', () => {
     expect((await ask(accountant, 800_000, entityId)).start.needed).toBe(true); // and may ask again
   });
 
+  it('F-shared-4 when the record under approval is deleted, the request is cancelled with it', async () => {
+    await withAdminTx((tx) =>
+      tx.insert(approvalPolicies).values({
+        orgId: school.orgId,
+        entityType: 'rooms',
+        name: 'New rooms',
+        minAmount: 0,
+        steps: [{ roleKeys: ['director'] }],
+      }),
+    );
+    const room = await as(principal, (ctx) =>
+      roomsService.create(ctx, {
+        branchId: school.mainBranchId,
+        name: 'Room awaiting approval',
+        kind: 'classroom',
+        capacity: null,
+      }),
+    );
+    const start = await as(accountant, (ctx) =>
+      requestApproval(ctx, {
+        entityType: 'rooms',
+        entityId: room.id,
+        amount: 100,
+        summary: 'Open a new room',
+        branchId: school.mainBranchId,
+      }),
+    );
+    if (!start.needed) throw new Error('expected an approval request');
+
+    // Deleted by someone who neither asked nor decides: whoever may delete the record.
+    await as(principal, (ctx) => roomsService.remove(ctx, room.id));
+    const [row] = await adminDb()
+      .select()
+      .from(approvalRequests)
+      .where(eq(approvalRequests.id, start.requestId));
+    expect(row?.status).toBe('cancelled');
+    const trail = await as(director, (ctx) => approvalTrail(ctx, start.requestId));
+    expect(trail.map((step) => step.status)).toEqual(['skipped']);
+    // There is nothing left to decide.
+    await expect(
+      as(director, (ctx) => decideApproval(ctx, start.requestId, 'approve')),
+    ).rejects.toThrow();
+  });
+
   it('another school’s request cannot be found, let alone decided', async () => {
     const { start } = await ask(accountant, 800_000);
     if (!start.needed) throw new Error('expected an approval request');
@@ -422,7 +470,59 @@ describe('imports', () => {
     ]);
   });
 
-  it('step 1 checks every row and writes nothing to the real table; step 2 creates only the valid rows', async () => {
+  it('F-shared-7 a commit that is cut short leaves nothing behind, and committing again creates each row once', async () => {
+    let stopAt: string | null = 'Fragile B';
+    defineImporter({
+      kind: 'tests-fragile-rooms',
+      label: 'room',
+      permission: { resource: 'rooms', action: 'update' },
+      columns: [{ key: 'name', header: 'Room Name', required: true, example: 'Room 12' }],
+      row: z.object({ name: Name }),
+      commit: async (ctx, row, batch) => {
+        // Not a refusal of this row: the kind of failure nobody planned for.
+        if (row.name === stopAt) throw new Error('the server stopped');
+        const room = await roomsService.create(ctx, {
+          branchId: batch.branchId ?? school.mainBranchId,
+          name: row.name,
+          kind: 'classroom',
+          capacity: null,
+        });
+        return room.id;
+      },
+    });
+    const fileId = await uploadCsv(principal, 'Room Name\r\nFragile A\r\nFragile B\r\nFragile C\r\n');
+    const staged = await as(principal, (ctx) =>
+      stageImport(ctx, { kind: 'tests-fragile-rooms', fileId, branchId: school.mainBranchId }),
+    );
+    const fragile = () => adminDb().select().from(rooms).where(ilike(rooms.name, 'Fragile %'));
+
+    await expect(as(principal, (ctx) => commitImport(ctx, staged.batchId))).rejects.toThrow(
+      'the server stopped',
+    );
+    // The first row had been created when it stopped. It is gone with the rest of that commit.
+    expect(await fragile()).toEqual([]);
+    const waiting = await adminDb()
+      .select()
+      .from(importRows)
+      .where(eq(importRows.batchId, staged.batchId));
+    expect(waiting.map((row) => row.status)).toEqual(['valid', 'valid', 'valid']);
+
+    stopAt = null;
+    expect(await as(principal, (ctx) => commitImport(ctx, staged.batchId))).toEqual({
+      batchId: staged.batchId,
+      createdRows: 3,
+      failedRows: 0,
+    });
+    expect((await fragile()).map((room) => room.name).sort()).toEqual([
+      'Fragile A',
+      'Fragile B',
+      'Fragile C',
+    ]);
+    await expectError('RULE', () => as(principal, (ctx) => commitImport(ctx, staged.batchId)));
+    expect(await fragile()).toHaveLength(3);
+  });
+
+  it('R-shared-8 step 1 checks every row and writes nothing to the real table; step 2 creates only the valid rows, each on its own', async () => {
     const csv =
       'room name,KIND,capacity,Ignored Column\r\nImport Lab,lab,30,x\r\n,hall,10,x\r\nImport Hall,hall,zero,x\r\nImport Office,,,x\r\nImport Lab,lab,20,x\r\n';
     const fileId = await uploadCsv(principal, csv);

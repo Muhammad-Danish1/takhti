@@ -109,9 +109,21 @@ export const jobs = table(
       for: 'select',
       using: sql`${policySql.sameOrg(t.orgId)} and ${policySql.isStaff}`,
     }),
+    // Staff may change a job's state: the service allows it only to those who hold `jobs:retry`,
+    // to retry a failed job or cancel one that is still waiting. Nobody deletes a job this way.
+    customPolicy('jobs_update', {
+      for: 'update',
+      using: sql`${policySql.sameOrg(t.orgId)} and ${policySql.isStaff}`,
+      withCheck: sql`${policySql.sameOrg(t.orgId)} and ${policySql.isStaff}`,
+    }),
   ],
 );
-registerTable(jobs, 'jobs', { module: 'M00', scope: 'org', staff: 'append', member: 'insert' });
+registerTable(jobs, 'jobs', {
+  module: 'M00',
+  scope: 'org',
+  staff: { read: true, insert: true, update: true },
+  member: 'insert',
+});
 
 /** Recurring jobs. */
 export const jobSchedules = table(

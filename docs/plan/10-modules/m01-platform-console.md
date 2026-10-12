@@ -203,7 +203,7 @@ Enquiries from the marketing site.
 
 ## 5 · Rules
 
-- **R-platform-1** Provisioning an organisation is one transaction that creates: the organisation, its first branch, the 30 non-platform built-in roles with default permissions, default settings, the subscription in `trial`, `org_modules` from the plan, default grading schemes, fee heads, chart of accounts, notification templates and number sequences, and an invitation for the owner. If any part fails, nothing exists.
+- **R-platform-1** Provisioning an organisation is one transaction that creates: the organisation, its first branch, the 30 non-platform built-in roles with default permissions, default settings, the subscription in `trial`, `org_modules` from the plan, default grading schemes, fee heads, the chart of accounts (with its journals, account mappings and current fiscal year, see [M23](m23-accounting.md)), notification templates and number sequences, and an invitation for the owner. If any part fails, nothing exists.
 - **R-platform-2** A slug is lower-case letters, digits and hyphens, 3 to 40 characters, unique, and not a reserved word (`api`, `platform`, `hq`, `school`, `teach`, `family`, `learn`, `s`, `www`, `admin`, `app`).
 - **R-platform-3** Subscription states: `trial → active → past_due → suspended → cancelled`; `past_due → active` on payment; `suspended → active` on payment or by a super admin.
 - **R-platform-4** On the billing day an invoice is created for the next period: active students (at least 1) × price, less discount, not below the plan's minimum.

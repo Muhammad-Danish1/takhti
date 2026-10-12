@@ -1,12 +1,13 @@
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { Id, type exportFormats, type ModuleKey } from '@takhti/contracts';
+import { exportReady, Id, type exportFormats, type ModuleKey } from '@takhti/contracts';
 import { exportJobs, files } from '@takhti/db';
 import { storage } from '../providers/storage';
 import { audit } from './audit';
 import { stampOf, type Ctx } from './context';
 import { csvLine } from './csv';
 import { notFound, rule } from './errors';
+import { emit } from './events';
 import { newId } from './ids';
 import { defineJob, enqueue } from './jobs';
 import { assertModule } from './modules';
@@ -192,6 +193,12 @@ export const exportBuildJob = defineJob({
       .update(exportJobs)
       .set({ status: 'ready', fileId, rowCount: built.rows, ...stamp })
       .where(eq(exportJobs.id, exportId));
+    await emit(
+      ctx,
+      exportReady,
+      { exportId, kind: job.kind, userId: job.userId, rows: built.rows },
+      { entityType: 'exports', entityId: exportId },
+    );
   },
 });
 

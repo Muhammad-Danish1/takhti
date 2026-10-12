@@ -199,10 +199,10 @@ try {
     theirs.status === 200 && theirCodes.join(',') === 'AN',
     theirCodes.join(','),
   );
-  if (roomId)
+  if (mainCampus?.id)
     check(
       'and cannot reach a record of this school by its id (404)',
-      (await call(otherSchool.token, 'GET', `/api/v1/rooms/${roomId}`)).status === 404,
+      (await call(otherSchool.token, 'GET', `/api/v1/branches/${mainCampus.id}`)).status === 404,
     );
 
   check(

@@ -113,7 +113,7 @@ export const journals = defineTable(
   { module: 'M23', scope: 'org' },
   {
     ...baseColumns,
-    /** `GJ`, `FEE`, `CASH`, `BANK`, `PAY`, `PUR`, `OPEN`, `CLOSE` */
+    /** `GJ`, `FEE`, `CASH`, `BANK`, `PAY`, `PUR`, `INV`, `OPEN`, `CLOSE` */
     code: text().notNull(),
     name: text().notNull(),
     kind: enumText(journalKinds).notNull(),
@@ -225,7 +225,11 @@ export const accountMappings = defineTable(
   },
   (t) => [
     uniqueIndex('account_mappings_key_branch_uq')
-      .on(t.key, sql`coalesce(${t.branchId}, '00000000-0000-0000-0000-000000000000'::uuid)`)
+      .on(
+        t.orgId,
+        t.key,
+        sql`coalesce(${t.branchId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
+      )
       .where(live(t)),
   ],
 );

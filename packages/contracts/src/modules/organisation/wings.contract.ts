@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Name, NameUr } from '../../kernel/primitives';
+import { GenderPolicy, Name, NameUr } from '../../kernel/primitives';
 import { baseEntity, defineResource, listQuery } from '../../kernel/resource';
 
 const grade = z.int().min(1).max(10);
@@ -9,6 +9,8 @@ const fields = {
   nameUr: NameUr.nullable(),
   gradeFrom: grade,
   gradeTo: grade,
+  /** A boys' wing and a girls' wing of one branch may cover the same grades. */
+  gender: GenderPolicy,
   headStaffId: z.uuid().nullable(),
 };
 
@@ -27,6 +29,7 @@ export const CreateWing = z
     nameUr: fields.nameUr.optional(),
     gradeFrom: fields.gradeFrom,
     gradeTo: fields.gradeTo,
+    gender: fields.gender.optional(),
     headStaffId: fields.headStaffId.optional(),
   })
   .refine(rangeIsOrdered, rangeError);
@@ -42,7 +45,7 @@ export type UpdateWing = z.output<typeof UpdateWing>;
 export const ListWings = listQuery({
   sortable: ['name', 'gradeFrom', 'createdAt'],
   defaultSort: 'gradeFrom',
-  filters: { branchId: z.uuid().optional() },
+  filters: { branchId: z.uuid().optional(), gender: GenderPolicy.optional() },
 });
 export type ListWingsParams = z.output<typeof ListWings>;
 

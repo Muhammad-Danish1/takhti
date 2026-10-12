@@ -1,16 +1,32 @@
 import { randomUUID } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import type { Branch, Page } from '@takhti/contracts';
-import { nextValue, registerBranchBlocker, type Actor } from '@takhti/core';
-import { adminDb, auditLog, branches } from '@takhti/db';
+import { generalWorkingWeek, type Branch, type Page } from '@takhti/contracts';
+import {
+  nextValue,
+  registerBranchBlocker,
+  resolveSetting,
+  setSetting,
+  type Actor,
+} from '@takhti/core';
+import {
+  adminDb,
+  auditLog,
+  branches,
+  domainEvents,
+  feeVouchers,
+  students,
+  withAdminTx,
+} from '@takhti/db';
 import * as collection from '../../../apps/web/app/api/v1/branches/route';
 import * as item from '../../../apps/web/app/api/v1/branches/[id]/route';
 import * as activate from '../../../apps/web/app/api/v1/branches/[id]/activate/route';
 import * as deactivate from '../../../apps/web/app/api/v1/branches/[id]/deactivate/route';
+import { activeYear } from '../../helpers/classes';
 import { callRoute } from '../../helpers/http';
+import { makeStudent } from '../../helpers/people';
 import { createTestDb, type TestDb } from '../../helpers/test-db';
-import { as, seedOrg, type TestOrg } from '../../helpers/world';
+import { as, seedOrg, TEST_NOW, type TestOrg } from '../../helpers/world';
 
 /*
  * The first resource through all seven layers, and the pattern every later resource test follows.
@@ -337,6 +353,122 @@ describe('branches: rules', () => {
       '412 active students must be transferred or withdrawn first',
     );
     expect((await read(director, created.id)).data.status).toBe('active');
+  });
+
+  it('R-org-5 / T-org-4: the students and the vouchers that block it are counted where they are', async () => {
+    const created = (await create(director, newBranch({ code: 'CNT' }))).data;
+    const voucherId = randomUUID();
+    const leaverId = await withAdminTx(async (tx) => {
+      const base = { orgId: school.orgId, now: TEST_NOW };
+      const first = await makeStudent(tx, { ...base, branchId: created.id, fullName: 'Ali Raza' });
+      await makeStudent(tx, {
+        ...base,
+        branchId: created.id,
+        fullName: 'Sara Raza',
+        familyId: first.familyId,
+      });
+      // One who has left, and one at another branch: neither holds this branch open.
+      const left = await makeStudent(tx, { ...base, branchId: created.id, fullName: 'Old Boy' });
+      await tx
+        .update(students)
+        .set({ status: 'left', leftOn: '2026-06-30' })
+        .where(eq(students.id, left.studentId));
+      await makeStudent(tx, { ...base, branchId: school.mainBranchId, fullName: 'Elsewhere' });
+      await tx.insert(feeVouchers).values({
+        id: voucherId,
+        orgId: school.orgId,
+        createdAt: TEST_NOW,
+        updatedAt: TEST_NOW,
+        branchId: created.id,
+        voucherNo: 'TV-2610-900001',
+        challanNo: 'TV-2610-900001',
+        studentId: first.studentId,
+        familyId: first.familyId,
+        academicYearId: await activeYear(tx, base),
+        billingMonth: '2026-10-01',
+        periodLabel: 'October 2026',
+        issueDate: '2026-10-01',
+        dueDate: '2026-10-10',
+        total: 450_000,
+      });
+      return left.studentId;
+    });
+    expect(leaverId).toBeTruthy();
+
+    const blocked = await setStatus(deactivate, director, created.id, 1);
+    expect(blocked.status).toBe(409);
+    expect(blocked.error?.message).toMatch(/^This branch cannot be deactivated yet: /);
+    expect(blocked.error?.message).toContain(
+      '2 active students must be transferred or withdrawn first',
+    );
+    expect(blocked.error?.message).toContain('1 open voucher must be paid or cancelled first');
+
+    // With the students withdrawn and the voucher paid, nothing holds it.
+    await withAdminTx(async (tx) => {
+      await tx
+        .update(students)
+        .set({ status: 'left', leftOn: '2026-10-12' })
+        .where(and(eq(students.branchId, created.id), eq(students.status, 'active')));
+      await tx
+        .update(feeVouchers)
+        .set({ status: 'paid', paid: 450_000 })
+        .where(eq(feeVouchers.id, voucherId));
+    });
+    const done = await setStatus(deactivate, director, created.id, 1);
+    expect(done.data.status).toBe('inactive');
+    const [told] = await adminDb()
+      .select()
+      .from(domainEvents)
+      .where(and(eq(domainEvents.name, 'branch.deactivated'), eq(domainEvents.entityId, created.id)));
+    expect(told?.payload).toEqual({ branchId: created.id, code: 'CNT', name: created.name });
+  });
+
+  it('R-org-11: a new branch starts with the group’s settings, and says what else is to be copied into it', async () => {
+    const week = { workingDays: [1, 2, 3, 4, 5], shortDay: null };
+    await as(director, (ctx) => setSetting(ctx, generalWorkingWeek, week));
+    const eventOf = async (branchId: string) => {
+      const [event] = await adminDb()
+        .select()
+        .from(domainEvents)
+        .where(and(eq(domainEvents.name, 'branch.created'), eq(domainEvents.entityId, branchId)));
+      return event?.payload;
+    };
+
+    const plain = await create(director, newBranch({ code: 'NEW', name: 'Model Town Campus' }));
+    expect(plain.status).toBe(201);
+    // Nothing was copied for the working week: with no value of its own, the group's is in force.
+    expect(
+      await as(director, (ctx) => resolveSetting(ctx, generalWorkingWeek, plain.data.id)),
+    ).toEqual({ value: week, source: 'org' });
+    // The bell schedule and the fee structures are copied by the modules that own them.
+    expect(await eventOf(plain.data.id)).toEqual({
+      branchId: plain.data.id,
+      code: 'NEW',
+      name: 'Model Town Campus',
+      copyBellSchedule: true,
+      copyFeeStructuresFrom: null,
+    });
+
+    const copying = await create(
+      director,
+      newBranch({ code: 'CPY', copyBellSchedule: false, copyFeeStructuresFrom: school.mainBranchId }),
+    );
+    expect(copying.status).toBe(201);
+    expect(await eventOf(copying.data.id)).toMatchObject({
+      copyBellSchedule: false,
+      copyFeeStructuresFrom: school.mainBranchId,
+    });
+    // What to copy is an instruction, not a part of the branch.
+    expect(Object.keys(copying.data)).not.toContain('copyFeeStructuresFrom');
+
+    const foreign = await create(
+      director,
+      newBranch({ code: 'FRN', copyFeeStructuresFrom: other.mainBranchId }),
+    );
+    expect(foreign.status).toBe(422);
+    expect(foreign.error?.fields).toEqual({
+      copyFeeStructuresFrom: ['Choose a branch of this school group'],
+    });
   });
 
   it('R-org-6: an inactive branch is read-only until it is activated again', async () => {

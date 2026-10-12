@@ -9,6 +9,7 @@ export * from './kernel/crypto';
 export * from './kernel/csv';
 export * from './kernel/dates';
 export * from './kernel/db-service';
+export * from './kernel/documents';
 export * from './kernel/env';
 export * from './kernel/errors';
 export * from './kernel/events';
@@ -25,12 +26,14 @@ export * from './kernel/money';
 export * from './kernel/notify';
 export * from './kernel/permissions';
 export * from './kernel/rate-limit';
+export * from './kernel/record-access';
 export * from './kernel/scope';
 export * from './kernel/search';
 export * from './kernel/sequences';
 export * from './kernel/session';
 export * from './kernel/settings';
 export * from './kernel/state-machine';
+export * from './kernel/sync';
 
 // Outside services, each behind an interface with a local stand-in.
 export * from './providers/ai';
@@ -41,9 +44,53 @@ export * from './providers/storage';
 
 // Modules. The standard operations of every resource are written by `pnpm scaffold:api`.
 export * from './modules/generated';
+export * from './modules/academics/scope';
+export * from './modules/accounting/fiscal-calendar';
+export * from './modules/accounting/ledger';
+export * from './modules/accounting/ledger.db-service';
+export * from './modules/accounting/ledger.rules';
 export * from './modules/identity/me.service';
+export * from './modules/inventory/stock';
+export * from './modules/inventory/stock.db-service';
+export * from './modules/inventory/stock.rules';
+export * from './modules/messaging/audiences';
+export * from './modules/messaging/dev-outbox.service';
+export * from './modules/messaging/dispatch';
+export * from './modules/messaging/dispatch.rules';
+export * from './modules/messaging/messaging.db-service';
+export * from './modules/messaging/render';
 export * from './modules/organisation/branches.db-service';
 export * from './modules/organisation/branches.service';
+export * from './modules/organisation/onboarding.service';
+export * from './modules/organisation/org.service';
 export * from './modules/organisation/rooms.db-service';
 export * from './modules/organisation/rooms.service';
+export * from './modules/organisation/settings.service';
+export * from './modules/organisation/wings.db-service';
+export * from './modules/organisation/wings.service';
+export * from './modules/notices/calendar.service';
+export * from './modules/reports/registry';
+export * from './modules/reports/reports.service';
+export * from './modules/shared/approval-policies.service';
+export * from './modules/shared/approvals.service';
 export * from './modules/shared/cleanup.job';
+export * from './modules/shared/custom-fields.rules';
+export * from './modules/shared/custom-fields.service';
+export * from './modules/shared/files.service';
+export * from './modules/shared/imports.service';
+export * from './modules/shared/integrity.service';
+export * from './modules/shared/jobs.service';
+export * from './modules/shared/notes.service';
+export * from './modules/shared/search.service';
+export * from './modules/shared/sync.service';
+export * from './modules/tax/calc';
+export * from './modules/tax/tax.db-service';
+export * from './modules/tax/tax.service';
+
+// What each module answers to global search, and what of its records stops another module's
+// action. These files only register; they export nothing.
+import './modules/fees/fees.blockers';
+import './modules/fees/fees.search';
+import './modules/staff/staff.search';
+import './modules/students/students.blockers';
+import './modules/students/students.search';

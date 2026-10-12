@@ -82,7 +82,10 @@ export function fakePaymentProvider() {
     },
     async inquire(providerReference) {
       const payment = payments.get(providerReference);
-      if (!payment) return { providerReference, state: 'failed' };
+      // A payment this process never heard of is not a failed one. The web app and the worker each
+      // have their own stand-in, so the worker's inquiry about a checkout made in the web app must
+      // say "cannot tell", never decide the payment's fate.
+      if (!payment) return { unavailable: true };
       const { amount: _amount, reference: _reference, ...status } = payment;
       return status;
     },

@@ -1,5 +1,5 @@
 import { getColumns, sql } from 'drizzle-orm';
-import type { PgColumn } from 'drizzle-orm/pg-core';
+import { getTableConfig, type PgColumn } from 'drizzle-orm/pg-core';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { adminDb, identifier, registeredTables, rowsOf } from '@takhti/db';
 import { createTestDb, type TestDb } from '../helpers/test-db';
@@ -139,5 +139,59 @@ describe('uniqueness', () => {
       'user_preferences_user_uq',
     ];
     expect(rows.map((row) => row.name)).toEqual([...forEver].sort());
+  });
+
+  it('a unique rule of a school\'s table is tied to that school, so two schools can never clash', () => {
+    // Tied means: the index names org_id, or a required id of another row of the same school.
+    // A rule on a key and an optional branch alone once let only one school on the whole platform
+    // hold a group-level account mapping.
+    const untied: string[] = [];
+    for (const table of tables) {
+      if (table.scope !== 'org' && table.scope !== 'branch') continue;
+      const config = getTableConfig(table.table);
+      const byName = new Map(config.columns.map((column) => [column.name, column]));
+      for (const index of config.indexes) {
+        if (!index.config.unique) continue;
+        const names = index.config.columns.map((column) => {
+          const name = (column as { name?: unknown }).name;
+          return typeof name === 'string' ? name : undefined;
+        });
+        const tied = names.some((name) => {
+          const column = name === undefined ? undefined : byName.get(name);
+          return (
+            name === 'org_id' ||
+            (column !== undefined &&
+              name !== 'id' &&
+              column.getSQLType() === 'uuid' &&
+              column.notNull)
+          );
+        });
+        if (!tied && index.config.name) untied.push(index.config.name);
+      }
+    }
+    // Deliberately not tied to a school:
+    const acrossSchools = [
+      // One thing on the whole platform: a token, a stored path, a school's code, a web address.
+      'admission_applications_tracking_token_hash_uq',
+      'api_keys_key_hash_uq',
+      'calendar_feeds_token_hash_uq',
+      'files_path_uq',
+      'generated_documents_verify_uq',
+      'id_cards_qr_token_hash_uq',
+      'invitations_token_uq',
+      'orgs_slug_uq',
+      'site_settings_custom_domain_uq',
+      // The kernel puts the organisation into the key itself (`scopeKey` in kernel/jobs.ts).
+      'jobs_concurrency_uq',
+      'jobs_dedupe_uq',
+      // On ids of rows of the school that are optional here: an id is the school's own already.
+      'chat_threads_section_uq',
+      'chat_threads_student_teacher_staff_uq',
+      'id_cards_active_staff_uq',
+      'id_cards_active_student_uq',
+      'substitutions_substitution_date_substitute_teacher_lesson_no_uq',
+      'wallet_transactions_source_type_source_kind_uq',
+    ];
+    expect(untied.sort()).toEqual([...acrossSchools].sort());
   });
 });

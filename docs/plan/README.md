@@ -4,7 +4,7 @@ Takhti is school management software for Pakistan, for school groups teaching Gr
 
 **Where the build stands, what comes next and what was left out on purpose: [`docs/STATUS.md`](../STATUS.md).** Read it before starting a session and update it before ending one.
 
-**Status:** Phase 0 is built and passing. [Phase 1](20-phases/phase-01-database.md) has all 416 tables in place with their access rules and security tests (11 Oct 2026); demo data exists for setup, people, admissions, the front office and the classroom modules, and the rest is created through the services of Phase 2. [Phase 2](20-phases/phase-02-services-and-routes.md) has begun: the plain operations of 222 resources (567 of 1,615 routes) are generated and tested; the modules' own rules and named actions are next.
+**Status:** Phase 0 is built and passing. [Phase 1](20-phases/phase-01-database.md) has all 416 tables in place with their access rules and security tests (11 Oct 2026); demo data exists for setup, people, admissions, the front office and the classroom modules, and the rest is created through the services of Phase 2. [Phase 2](20-phases/phase-02-services-and-routes.md) is under way: the plain operations of 222 resources are generated and tested, and the pieces every module leans on are built (ledger posting, stock movement, tax calculators, notification dispatch, documents, the report registry, the calendar, the offline upload), and the first two modules are finished by hand with every rule tested (the shared kernel and the organisation, 12 Oct 2026), so 653 of 1,615 routes exist; the identity and platform modules are next, then every other module's own rules and named actions.
 
 ## How the plan is organised
 
@@ -101,7 +101,7 @@ Everything runs on a local Supabase in Docker through Phase 17. Phase 18 needs s
 |---|---|---|---|
 | 0 · Setup and kernel | Done | 10 Oct 2026 | 10 Oct 2026 |
 | 1 · Database, contracts and seed data | **Tables done; closing tasks open.** 416 of 416 tables and 439 permissions, generated from the specs by `pnpm scaffold`. Demo data exists for Waves 1 and 2 and part of Wave 3; the rest is created through the services. Open: the settings and events catalogues, the plan-to-module map, the optional squash, exit checks 3, 5 and 6 | 10 Oct 2026 | |
-| 2 · Services and routes | **In progress.** 567 of 1,615 routes exist: the plain list, add, read, change and delete operations of 222 resources, written by `pnpm scaffold:api`, each behind its permission and proved by a generated test. No module rule is applied yet. Next: the cross-cutting pieces (step 2.1), then Wave 0 by hand, then each module's rules, named actions and demo data | 11 Oct 2026 | |
+| 2 · Services and routes | **In progress.** 653 of 1,615 routes exist: the plain list, add, read, change and delete operations of 222 resources, written by `pnpm scaffold:api`; the cross-cutting pieces (step 2.1); and, by hand with every rule, failure case and listed test named, the shared kernel (M00) and the organisation (M02). Next: identity (M03) and the platform console (M01) to finish step 2.2, then each module's rules, named actions and demo data | 11 Oct 2026 | |
 | 3 · API-services and hooks | Not started as a phase. The 222 plain resources already have their API client and hooks, written with their routes | | |
 | 4 · Frontend foundation | Not started | | |
 | 5 · Sign-in and access | Not started | | |

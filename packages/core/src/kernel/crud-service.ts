@@ -10,14 +10,16 @@ import type {
   PermissionKey,
   UpdateData,
 } from '@takhti/contracts';
+import { cancelApproval } from './approval';
 import { audit } from './audit';
 import { runBulk } from './bulk';
 import type { Ctx } from './context';
 import type { Condition, DbService, InsertOf, PatchOf, RowOf, TenantTable } from './db-service';
 import { rule } from './errors';
 import { emit } from './events';
-import { assertModule } from './modules';
+import { assertModule, isModuleEnabled } from './modules';
 import { assertPermission } from './permissions';
+import { registerRecordAccess } from './record-access';
 
 type Awaitable<T> = T | Promise<T>;
 
@@ -171,6 +173,20 @@ export function createCrudService<R extends AnyResource, T extends TenantTable>(
     return summary === undefined ? {} : { summary };
   };
 
+  // Files, notes and attachments hang on "any record". A plain resource answers for itself: it may
+  // be read by whoever may open it here, and changed by whoever may change it.
+  const reachable = async (ctx: Ctx, action: CrudAction, id: string): Promise<boolean> => {
+    const needed = permissions[action];
+    if (needed === false) return false;
+    if (needed !== SIGNED_IN && !ctx.actor.permissions.has(needed)) return false;
+    if (options.module && !(await isModuleEnabled(ctx, options.module))) return false;
+    return (await db.find(ctx, id, await scopeOf(ctx))) !== undefined;
+  };
+  registerRecordAccess(resource, {
+    canRead: (ctx, id) => reachable(ctx, 'get', id),
+    canUpdate: (ctx, id) => reachable(ctx, 'update', id),
+  });
+
   async function createOne(ctx: Ctx, input: CreateData<R>): Promise<EntityOf<R>> {
     await rules?.beforeCreate?.(ctx, input);
     const row = await db.insert(ctx, await toInsert(input, ctx));
@@ -225,6 +241,8 @@ export function createCrudService<R extends AnyResource, T extends TenantTable>(
       const current = await db.get(ctx, id, await scopeOf(ctx));
       await rules?.beforeRemove?.(ctx, current);
       await db.remove(ctx, id);
+      // F-shared-4: a request waiting for approval of this record has nothing left to approve.
+      await cancelApproval(ctx, resource, id, { recordDeleted: true });
       await audit(ctx, resource, 'delete', id, {
         before: current,
         ...summarise(current, 'delete'),

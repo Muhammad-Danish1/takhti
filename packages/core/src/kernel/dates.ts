@@ -78,6 +78,14 @@ export function pkToIso(date: DateStr, time = '00:00'): string {
 export const addSeconds = (iso: string, seconds: number): string =>
   new Date(Date.parse(iso) + seconds * 1000).toISOString();
 
+/**
+ * Whether one moment is later than another. Moments read from the database are written differently
+ * from `ctx.now` (`2026-10-12 06:00:00+00` against `2026-10-12T06:00:00.000Z`), so they are never
+ * compared as text.
+ */
+export const isLaterMoment = (moment: string, than: string): boolean =>
+  Date.parse(moment) > Date.parse(than);
+
 export const addDays = (date: DateStr, days: number): DateStr =>
   fromDayNumber(toDayNumber(date) + days);
 
@@ -200,6 +208,27 @@ export function ageOn(dateOfBirth: DateStr, date: DateStr): number {
 export function yearStarting(date: DateStr, startMonth: number): number {
   const { year, month } = parts(date);
   return month >= startMonth ? year : year - 1;
+}
+
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
+
+/** A date as a person reads it in a message: `31 July 2027`. Screens format dates themselves, in the user's language. */
+export function formatDay(date: DateStr): string {
+  const { year, month, day } = parts(date);
+  return `${day} ${MONTH_NAMES[month - 1]} ${year}`;
 }
 
 /** Pieces used by human-facing number formats: `26`, `2026`, `2610`. */

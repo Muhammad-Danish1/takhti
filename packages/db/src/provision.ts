@@ -13,6 +13,7 @@ import {
   type RoleKey,
 } from '@takhti/contracts';
 import type { Tx } from './client';
+import { provisionAccounting } from './provision/accounting';
 import {
   branches,
   membershipBranches,
@@ -28,7 +29,8 @@ import {
 
 /*
  * The rows a new school group starts with: the organisation, its branches, the built-in roles with
- * their default permissions, its modules and the setup checklist.
+ * their default permissions, its modules, the setup checklist and its accounting (the chart of
+ * accounts, the journals, the account mappings and the current fiscal year).
  *
  * Written once and used by everything that creates an organisation: the seed, the test helpers and
  * the platform's "create organisation" service. All of it runs on the privileged connection,
@@ -187,6 +189,13 @@ export async function provisionOrg(tx: Tx, input: NewOrg): Promise<ProvisionedOr
       status: 'pending' as const,
     })),
   );
+
+  await provisionAccounting(tx, {
+    orgId,
+    fiscalYearStartMonth: input.fiscalYearStartMonth ?? 7,
+    createdBy: input.createdBy ?? null,
+    now: input.now,
+  });
 
   return { orgId, branchIds, roleIds };
 }

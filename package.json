@@ -34,7 +34,10 @@
     "smoke": "tsx --env-file-if-exists=.env.local tests/smoke/local.ts",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "format": "prettier --write .",
+    "api:manifest": "tsx apps/web/scripts/api-manifest.ts",
+    "api:verify-plan": "tsx apps/web/scripts/api-verify-plan.ts",
     "plan:check": "node docs/plan/_tools/check.mjs",
+    "plan:coverage": "node docs/plan/_tools/coverage.mjs",
     "scaffold": "node docs/plan/_tools/scaffold.mjs",
     "scaffold:api": "tsx docs/plan/_tools/scaffold-api.mjs"
   },

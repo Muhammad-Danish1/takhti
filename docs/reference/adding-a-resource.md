@@ -88,8 +88,10 @@ export const { GET, POST } = collectionRoutes(roomsContract, roomsService);
 ```
 
 ```ts
-export const { GET, PATCH, DELETE } = itemRoutes(roomsContract, roomsService);
+export const { PATCH, DELETE } = itemRoutes(roomsContract, roomsService);
 ```
+
+Export only the methods the module's route table lists: the plan has no route that reads one room, so `GET` is left out. Then run `pnpm api:manifest` and `pnpm api:verify-plan`: the first writes the route into the manifest, the second fails if the plan does not have it or gives it another permission.
 
 A named action is its own file, `[id]/<verb>/route.ts`, built with `defineRoute({ params, body, handler })`. Mark anything that must not happen twice `idempotent: true`. A route file contains no logic.
 

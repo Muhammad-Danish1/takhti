@@ -104,7 +104,7 @@ beforeEach(async () => {
 });
 
 describe('queueing', () => {
-  it('a job queued in a transaction that rolls back does not exist', async () => {
+  it('T-shared-8 a job queued in a transaction that rolls back does not exist', async () => {
     await expect(
       as(principal, async (ctx) => {
         await enqueue(ctx, noteJob, { text: 'never' });
@@ -140,7 +140,7 @@ describe('queueing', () => {
     expect(await as(principal, (ctx) => ctx.db.select().from(jobs))).toHaveLength(1);
   });
 
-  it('with a dedupe key the same job is not queued twice, while each school keeps its own', async () => {
+  it('T-shared-8 with a dedupe key the same job is not queued twice, while each school keeps its own', async () => {
     const theirs = await other.actor('principal');
     await as(principal, (ctx) =>
       enqueue(ctx, noteJob, { text: 'a' }, { dedupeKey: 'reminder:2026-10' }),
@@ -207,7 +207,7 @@ describe('the worker', () => {
     expect(first?.payload).toEqual({ text: 'urgent' });
   });
 
-  it('a failing job is retried with a growing delay and ends failed with its reason', async () => {
+  it('T-shared-8 a failing job is retried with a growing delay and ends failed with its reason', async () => {
     freezeTime('2026-10-12T06:00:00.000Z');
     failTimes = 99;
     await as(principal, (ctx) => enqueue(ctx, noteJob, { text: 'doomed' }));
@@ -264,7 +264,7 @@ describe('the worker', () => {
     );
   });
 
-  it('jobs sharing a concurrency key never run together', async () => {
+  it('T-shared-8 jobs sharing a concurrency key never run together', async () => {
     await as(principal, (ctx) =>
       enqueue(ctx, noteJob, { text: 'first', key: 'vouchers:main:2026-10' }),
     );
@@ -326,7 +326,7 @@ describe('the worker', () => {
     expect(job?.lastError).toMatch(/did not finish within 1 seconds/);
   });
 
-  it('a job left running by a worker that died is returned to the queue, or failed if it has no tries left', async () => {
+  it('T-shared-8 a job left running by a worker that died is returned to the queue, or failed if it has no tries left', async () => {
     freezeTime('2026-10-12T06:00:00.000Z');
     await as(principal, (ctx) => enqueue(ctx, noteJob, { text: 'orphan' }));
     await as(principal, (ctx) => enqueue(ctx, slowJob, {}));
@@ -391,16 +391,17 @@ describe('schedules', () => {
     freezeTime('2026-10-12T10:00:00.000Z');
     await syncSchedules();
     const rows = await adminDb().select().from(jobSchedules);
-    // The product's own nightly cleanup, and the two schedules of this file.
+    // The product's own nightly cleanup and data checks, and the two schedules of this file.
     expect(rows.map((row) => row.name).sort()).toEqual([
       'shared.cleanup.nightly',
+      'shared.integrity.nightly',
       'tests.nightly.per-branch',
       'tests.nightly.per-org',
     ]);
     // A new schedule waits for its next due time rather than firing for one already past.
     expect(await enqueueDueSchedules()).toBe(0);
     await syncSchedules();
-    expect(await adminDb().select().from(jobSchedules)).toHaveLength(3);
+    expect(await adminDb().select().from(jobSchedules)).toHaveLength(4);
   });
 
   it('a due schedule queues one job per active school, once, however often the check runs', async () => {

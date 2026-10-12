@@ -1,11 +1,21 @@
-import { and, asc, desc, eq, isNull, lte, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, lte, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { approvalPolicies, approvalRequests, approvalSteps } from '@takhti/db';
+import { approvalApproved, approvalRejected, approvalRequested } from '@takhti/contracts';
+import {
+  approvalPolicies,
+  approvalRequests,
+  approvalSteps,
+  membershipBranches,
+  membershipRoles,
+  memberships,
+  roles,
+} from '@takhti/db';
 import { audit } from './audit';
 import { stampOf, type Ctx } from './context';
 import { conflict, forbidden, invalid, notFound, rule } from './errors';
+import { emit } from './events';
 import { newId } from './ids';
-import { assertNotSelf, hasAnyRole } from './scope';
+import { assertNotSelf, hasAnyRole, hasBranch } from './scope';
 
 /*
  * Approvals: a change that needs a second person before it takes effect (a large discount, an
@@ -45,6 +55,89 @@ export interface ApprovalAsk {
 }
 
 export type ApprovalStart = { needed: false } | { needed: true; requestId: string };
+
+/** The steps of a policy, or undefined when what is stored cannot be read as steps. */
+export const stepsOf = (stored: unknown): ApprovalSteps | undefined => {
+  const parsed = Steps.safeParse(stored);
+  return parsed.success ? parsed.data : undefined;
+};
+
+/**
+ * R-shared-6: who may decide a step. Staff holding one of its roles (the owner may stand in at any
+ * step) who work at the request's branch; never the person who asked.
+ */
+export async function approversOf(
+  ctx: Ctx,
+  roleKeys: readonly string[],
+  branchId: string | null,
+  requestedBy: string,
+): Promise<string[]> {
+  const holders = await ctx.db
+    .select({
+      membershipId: memberships.id,
+      userId: memberships.userId,
+      allBranches: memberships.allBranches,
+    })
+    .from(membershipRoles)
+    .innerJoin(roles, eq(roles.id, membershipRoles.roleId))
+    .innerJoin(memberships, eq(memberships.id, membershipRoles.membershipId))
+    .where(
+      and(
+        inArray(roles.key, [...roleKeys, 'owner']),
+        eq(memberships.status, 'active'),
+        eq(memberships.kind, 'staff'),
+        isNull(membershipRoles.deletedAt),
+        isNull(memberships.deletedAt),
+        isNull(roles.deletedAt),
+      ),
+    );
+  let reaching = holders;
+  const limited = holders.filter((holder) => !holder.allBranches).map((row) => row.membershipId);
+  if (branchId && limited.length > 0) {
+    const atBranch = await ctx.db
+      .select({ membershipId: membershipBranches.membershipId })
+      .from(membershipBranches)
+      .where(
+        and(
+          inArray(membershipBranches.membershipId, limited),
+          eq(membershipBranches.branchId, branchId),
+          isNull(membershipBranches.deletedAt),
+        ),
+      );
+    const here = new Set(atBranch.map((row) => row.membershipId));
+    reaching = holders.filter((holder) => holder.allBranches || here.has(holder.membershipId));
+  }
+  return [...new Set(reaching.map((holder) => holder.userId))].filter((id) => id !== requestedBy);
+}
+
+/** Tells the people who may decide the step that is now waiting. */
+async function announce(
+  ctx: Ctx,
+  request: {
+    id: string;
+    entityType: string;
+    entityId: string;
+    summary: string;
+    branchId: string | null;
+    requestedBy: string;
+  },
+  step: number,
+  roleKeys: readonly string[],
+): Promise<void> {
+  await emit(
+    ctx,
+    approvalRequested,
+    {
+      requestId: request.id,
+      entityType: request.entityType,
+      entityId: request.entityId,
+      summary: request.summary,
+      step,
+      approverUserIds: await approversOf(ctx, roleKeys, request.branchId, request.requestedBy),
+    },
+    { entityType: 'approval-requests', entityId: request.id },
+  );
+}
 
 /**
  * Asks for approval if a policy says this change needs it.
@@ -122,6 +215,19 @@ export async function requestApproval(ctx: Ctx, ask: ApprovalAsk): Promise<Appro
     summary: `Asked for approval: ${ask.summary}`,
     branchId: ask.branchId ?? null,
   });
+  await announce(
+    ctx,
+    {
+      id: requestId,
+      entityType: ask.entityType,
+      entityId: ask.entityId,
+      summary: ask.summary.slice(0, 500),
+      branchId: ask.branchId ?? null,
+      requestedBy: ctx.actor.userId,
+    },
+    1,
+    steps.data[0]?.roleKeys ?? [],
+  );
   return { needed: true, requestId };
 }
 
@@ -166,6 +272,9 @@ export async function decideApproval(
   // The owner holds every permission, so may stand in at any step.
   if (!hasAnyRole(ctx, [...step.roleKeys, 'owner']))
     throw forbidden('This step is waiting for someone with a different role');
+  // R-shared-6: with access to the request's branch.
+  if (request.branchId && ctx.actor.kind !== 'system' && !hasBranch(ctx, request.branchId))
+    throw forbidden('This request belongs to a branch you do not work at');
 
   const trimmed = note?.trim() ?? '';
   if (decision === 'reject' && trimmed.length < 3)
@@ -192,6 +301,14 @@ export async function decideApproval(
 
   const effect = effects.get(request.entityType);
   const bump = { version: sql`${approvalRequests.version} + 1`, ...stamp };
+  const subject = { entityType: 'approval-requests', entityId: requestId };
+  const told = {
+    requestId,
+    entityType: request.entityType,
+    entityId: request.entityId,
+    summary: request.summary,
+    requestedBy: request.requestedBy,
+  };
 
   if (decision === 'reject') {
     await ctx.db
@@ -214,6 +331,7 @@ export async function decideApproval(
       summary: `Rejected: ${request.summary}`,
       branchId: request.branchId,
     });
+    await emit(ctx, approvalRejected, { ...told, note: trimmed }, subject);
     return { requestId, status: 'rejected' };
   }
 
@@ -226,6 +344,13 @@ export async function decideApproval(
       summary: `Approved step ${request.currentStep} of ${steps.data.length}: ${request.summary}`,
       branchId: request.branchId,
     });
+    // The next step's people are told it is now waiting for them.
+    await announce(
+      ctx,
+      request,
+      request.currentStep + 1,
+      steps.data[request.currentStep]?.roleKeys ?? [],
+    );
     return { requestId, status: 'pending', currentStep: request.currentStep + 1 };
   }
 
@@ -233,19 +358,26 @@ export async function decideApproval(
     .update(approvalRequests)
     .set({ status: 'approved', decidedAt: ctx.now, ...bump })
     .where(eq(approvalRequests.id, requestId));
+  // R-shared-7: the owning module applies the change in this same transaction.
   await effect?.approved(ctx, request.entityId);
   await audit(ctx, 'approval-requests', 'approve', requestId, {
     summary: `Approved: ${request.summary}`,
     branchId: request.branchId,
   });
+  await emit(ctx, approvalApproved, told, subject);
   return { requestId, status: 'approved' };
 }
 
-/** Withdraws a waiting request, when the record it was for is withdrawn or changed. Only the requester or a system job. */
+/**
+ * Withdraws a waiting request, when the record it was for is withdrawn or changed. Only the
+ * requester or a system job; or, with `recordDeleted`, whoever was allowed to delete the record
+ * (F-shared-4: there is nothing left to approve).
+ */
 export async function cancelApproval(
   ctx: Ctx,
   entityType: string,
   entityId: string,
+  options: { recordDeleted?: boolean } = {},
 ): Promise<boolean> {
   const [request] = await ctx.db
     .select()
@@ -261,7 +393,11 @@ export async function cancelApproval(
     .limit(1)
     .for('update');
   if (!request) return false;
-  if (ctx.actor.kind !== 'system' && request.requestedBy !== ctx.actor.userId)
+  if (
+    !options.recordDeleted &&
+    ctx.actor.kind !== 'system' &&
+    request.requestedBy !== ctx.actor.userId
+  )
     throw forbidden('Only the person who asked can withdraw this request');
   const stamp = { updatedAt: ctx.now, updatedBy: stampOf(ctx) };
   await ctx.db
@@ -284,7 +420,9 @@ export async function cancelApproval(
       ),
     );
   await audit(ctx, 'approval-requests', 'cancel', request.id, {
-    summary: `Withdrew: ${request.summary}`,
+    summary: options.recordDeleted
+      ? `Cancelled, because the record was deleted: ${request.summary}`
+      : `Withdrew: ${request.summary}`,
     branchId: request.branchId,
   });
   return true;

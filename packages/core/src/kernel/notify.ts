@@ -38,6 +38,17 @@ export function setNotificationDispatcher(next: NotificationDispatcher | undefin
   dispatcher = next;
 }
 
+const extraEvents = new Map<string, EventDef>();
+
+/** For tests: makes an event that is not in the catalogue known to dispatch and delivery. */
+export function registerEventForTests(definition: EventDef): void {
+  extraEvents.set(definition.key, definition);
+}
+
+/** The definition of an event by its key: the catalogue's, or one a test registered. */
+export const eventDefinition = (key: string): EventDef | undefined =>
+  extraEvents.get(key) ?? findEvent(key);
+
 export const notifyDispatchJob = defineJob({
   name: 'notify.dispatch',
   payload: z.object({ eventId: Id }),
@@ -53,7 +64,7 @@ export const notifyDispatchJob = defineJob({
       ctx.log.warn({ eventId }, 'event to dispatch was not found');
       return;
     }
-    const definition = findEvent(event.name);
+    const definition = eventDefinition(event.name);
     if (!definition || definition.rules.length === 0) return;
     if (!dispatcher) {
       ctx.log.debug(

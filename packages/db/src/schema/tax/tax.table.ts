@@ -185,6 +185,7 @@ export const statutoryFilings = defineTable(
     nonNegative('statutory_filings', t.amount),
     uniqueIndex('statutory_filings_kind_branch_period_from_uq')
       .on(
+        t.orgId,
         t.kind,
         sql`coalesce(${t.branchId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
         t.periodFrom,

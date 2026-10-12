@@ -1,8 +1,16 @@
-import { branchesContract, branchStatusMachine, type Branch } from '@takhti/contracts';
+import {
+  branchCreated,
+  branchDeactivated,
+  branchesContract,
+  branchStatusMachine,
+  type Branch,
+  type CreateBranch,
+} from '@takhti/contracts';
 import { audit } from '../../kernel/audit';
 import type { Ctx } from '../../kernel/context';
 import { createCrudService } from '../../kernel/crud-service';
 import { invalid, registerConstraintMessages, rule } from '../../kernel/errors';
+import { emit } from '../../kernel/events';
 import { assertCan } from '../../kernel/permissions';
 import { assertBranch } from '../../kernel/scope';
 import { assertTransition } from '../../kernel/state-machine';
@@ -34,6 +42,8 @@ const crud = createCrudService({
   db: branchesDb,
   // Deactivating is its own action below; nothing ever deletes a branch.
   actions: { delete: false },
+  // What to copy into a new branch is an instruction for other modules, not a column of the branch.
+  toInsert: ({ copyBellSchedule: _bell, copyFeeStructuresFrom: _fees, ...columns }) => columns,
   summary: (row, action) =>
     action === 'create'
       ? `Added branch ${row.name} (${row.code})`
@@ -89,11 +99,41 @@ async function setStatus(
     after: row,
     summary: `${to === 'inactive' ? 'Deactivated' : 'Activated'} branch ${row.name}`,
   });
+  if (to === 'inactive')
+    await emit(
+      ctx,
+      branchDeactivated,
+      { branchId: id, code: row.code, name: row.name },
+      { entityType: 'branches', entityId: id },
+    );
   return branchesContract.entity.parse(row);
 }
 
 export const branchesService = {
   ...crud,
+  /**
+   * Adds a branch. R-org-11: it starts with the group's values for every setting, since it has
+   * none of its own; the bell schedule and, if asked, another branch's fee structures are copied
+   * by the modules that own them, which listen for `branch.created`.
+   */
+  async create(ctx: Ctx, input: CreateBranch): Promise<Branch> {
+    if (input.copyFeeStructuresFrom && !(await branchesDb.find(ctx, input.copyFeeStructuresFrom)))
+      throw invalid({ copyFeeStructuresFrom: ['Choose a branch of this school group'] });
+    const branch = await crud.create(ctx, input);
+    await emit(
+      ctx,
+      branchCreated,
+      {
+        branchId: branch.id,
+        code: branch.code,
+        name: branch.name,
+        copyBellSchedule: input.copyBellSchedule ?? true,
+        copyFeeStructuresFrom: input.copyFeeStructuresFrom ?? null,
+      },
+      { entityType: 'branches', entityId: branch.id },
+    );
+    return branch;
+  },
   /** Deactivates a branch, if nothing blocks it. */
   deactivate: (ctx: Ctx, id: string, version: number) => setStatus(ctx, id, 'inactive', version),
   /** Makes an inactive branch usable again. */

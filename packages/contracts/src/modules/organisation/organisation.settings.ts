@@ -14,6 +14,7 @@ export const generalLanguages = defineSetting({
   schema: z.array(Locale).min(1),
   default: ['en', 'ur'],
   label: 'Languages offered',
+  readableBy: 'member',
 });
 
 export const generalNumberFormats = defineSetting({
@@ -48,6 +49,7 @@ export const generalWorkingWeek = defineSetting({
   }),
   default: { workingDays: [1, 2, 3, 4, 5, 6], shortDay: 5 },
   label: 'Working week',
+  readableBy: 'member',
 });
 
 export const securityPasswordPolicy = defineSetting({
@@ -60,6 +62,8 @@ export const securityPasswordPolicy = defineSetting({
   }),
   default: { minLength: 10, requireNumber: true, requireSymbol: false },
   label: 'Password rules',
+  // Anyone choosing a password is shown the rules it must meet.
+  readableBy: 'member',
 });
 
 export const securityMfaRoles = defineSetting({
@@ -76,6 +80,7 @@ export const securityMfaRoles = defineSetting({
     'it_admin',
   ],
   label: 'Roles that must use two-factor sign-in',
+  readableBy: 'org-settings:read',
 });
 
 export const securitySessionHours = defineSetting({

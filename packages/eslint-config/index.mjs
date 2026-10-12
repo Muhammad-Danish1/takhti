@@ -336,6 +336,7 @@ export default tseslint.config(
     // Command-line scripts talk to the person running them.
     files: [
       'packages/db/src/scripts/**',
+      'apps/web/scripts/**',
       'packages/db/src/seed/**',
       'tests/helpers/run-on-postgres.ts',
       'tests/smoke/**',

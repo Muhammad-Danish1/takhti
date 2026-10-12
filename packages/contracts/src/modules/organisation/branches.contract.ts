@@ -75,6 +75,10 @@ export const CreateBranch = z.object({
   openedOn: fields.openedOn.optional(),
   latitude: fields.latitude.optional(),
   longitude: fields.longitude.optional(),
+  /** R-org-11: give the new branch the group's bell schedule template. Yes, unless told otherwise. */
+  copyBellSchedule: z.boolean().optional(),
+  /** R-org-11: copy the fee structures of this branch of the group to the new one. */
+  copyFeeStructuresFrom: z.uuid().nullable().optional(),
 });
 export type CreateBranch = z.output<typeof CreateBranch>;
 

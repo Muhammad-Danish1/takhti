@@ -7,8 +7,10 @@ import type { SettingDef } from './kernel/settings';
 import { generatedPermissionModules } from './modules/generated';
 import { identityPermissions } from './modules/identity/identity.permissions';
 import { organisationPermissions } from './modules/organisation/organisation.permissions';
+import { organisationEvents } from './modules/organisation/organisation.events';
 import { organisationSettings } from './modules/organisation/organisation.settings';
 import { platformPermissions } from './modules/platform/platform.permissions';
+import { sharedEvents } from './modules/shared/shared.events';
 import { sharedPermissions } from './modules/shared/shared.permissions';
 
 /*
@@ -104,16 +106,34 @@ function gatherSettings(): SettingDef[] {
   return list;
 }
 
-export const settingCatalogue: readonly SettingDef[] = gatherSettings();
+const settings: SettingDef[] = gatherSettings();
+export const settingCatalogue: readonly SettingDef[] = settings;
 
-const settingsByKey: ReadonlyMap<string, SettingDef> = new Map(
-  settingCatalogue.map((setting) => [setting.key, setting]),
+const settingsByKey = new Map<string, SettingDef>(
+  settings.map((setting) => [setting.key, setting]),
 );
 export const findSetting = (key: string): SettingDef | undefined => settingsByKey.get(key);
 
+/**
+ * For tests: adds a setting to the catalogue, as a module's own settings file would, so that a
+ * rule about settings can be proved on a setting made for the purpose. Returns how to remove it.
+ */
+export function registerSettingForTests(setting: SettingDef): () => void {
+  if (settingsByKey.has(setting.key)) throw new Error(`Setting "${setting.key}" is declared twice`);
+  settings.push(setting);
+  settingsByKey.set(setting.key, setting);
+  return () => {
+    settingsByKey.delete(setting.key);
+    settings.splice(settings.indexOf(setting), 1);
+  };
+}
+
 function gatherEvents(): EventDef[] {
-  // Each module's `<module>.events.ts` is added here as its phase arrives.
-  const groups: readonly (readonly EventDef[])[] = [];
+  // Each module's `<module>.events.ts` is added here as its service is written.
+  const groups: readonly (readonly EventDef[])[] = [
+    sharedEvents as unknown as readonly EventDef[],
+    organisationEvents as unknown as readonly EventDef[],
+  ];
   const seen = new Set<string>();
   const list: EventDef[] = [];
   for (const group of groups) {

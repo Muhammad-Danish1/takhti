@@ -1,10 +1,10 @@
 # Where the build stands
 
-**Last updated: 11 October 2026.** This file is the handover. Anyone, or any AI assistant, starting a new session reads it first, and updates it before stopping. It says what exists, what was checked, what comes next and what was deliberately left out. The rules for working here are in [`CLAUDE.md`](../CLAUDE.md); the plan itself is in [`docs/plan/`](plan/README.md).
+**Last updated: 12 October 2026, morning.** This file is the handover. Anyone, or any AI assistant, starting a new session reads it first, and updates it before stopping. It says what exists, what was checked, what comes next and what was deliberately left out. The rules for working here are in [`CLAUDE.md`](../CLAUDE.md); the plan itself is in [`docs/plan/`](plan/README.md).
 
 ## In one paragraph
 
-Takhti is being built backend first. **Phase 0** (setup and kernel) is done. **Phase 1** (the database) has all 416 tables in place with their access rules, and demo data for about a third of the modules; a few of its closing tasks are open. **Phase 2** (the API) has begun: the plain list, add, read, change and delete operations exist for 222 kinds of record, which is 567 of the 1,615 planned operations. They check permissions and nothing else: **no business rule of any module is written yet**, and the other 1,048 operations are still to be written by hand. No screen exists. Everything up to this point is in git as one commit on `main`, made on 11 October 2026; there is no remote, so nothing is pushed anywhere.
+Takhti is being built backend first. **Phase 0** (setup and kernel) is done. **Phase 1** (the database) has all 416 tables in place with their access rules, and demo data for about a third of the modules; a few of its closing tasks are open. **Phase 2** (the API) is under way. The plain list, add, read, change and delete operations exist for 222 kinds of record; they check permissions and nothing else. **The shared services every module leans on are now built and tested** (step 2.1): posting to the accounts, moving stock, the tax calculators, telling people (the bell and outside messages through local stand-ins), making a document, the report library, the calendar and the offline upload. **The first two modules are finished by hand** (step 2.2, half done): the shared kernel (files, approvals, background jobs, imports and exports, custom fields, notes, saved views, global search, data checks, offline devices) and the organisation (school profile, settings, branches, wings, rooms, the setup checklist). Each has every operation the plan lists and a named test for every rule. In all, 653 of the 1,615 planned operations exist. **The other 42 modules have no business rules yet**: that is the largest part of the phase, 962 operations written by hand, module by module; identity (roles, members, invitations, the audit log) and the platform console come next. No screen exists. The first commit on `main` holds everything up to the morning of 11 October 2026; **the work of steps 2.1 and 2.2 is in the working tree and not committed**, because a commit is made only when the owner asks. There is no remote, so nothing is pushed anywhere.
 
 ## Start a new session like this
 
@@ -27,7 +27,9 @@ pnpm db:reset --small
 pnpm check
 ```
 
-`pnpm db:reset` prints the seeded passwords: from an assistant session hide that line (pipe through `grep -v "Password for every account"`). `pnpm check` takes about eight minutes; see "How long things take" below.
+`pnpm db:reset` prints the seeded passwords: from an assistant session hide that line (pipe through `grep -v "Password for every account"`). `pnpm check` takes about twelve minutes; see "How long things take" below.
+
+If `pnpm db:start` answers "already running" and then fails on the database container (it does after Windows restarts), run `pnpm db:stop` and then `pnpm db:start`. The data is kept.
 
 If `pnpm db:verify-plan` complains that the plan file is missing, run `pnpm plan:check` first: it rebuilds the plan's indexes, which are not kept in git.
 
@@ -38,66 +40,120 @@ If `pnpm db:verify-plan` complains that the plan file is missing, run `pnpm plan
 | Layer | State | Where |
 |---|---|---|
 | Plan | 45 module specs, 24 phases, foundation and reference documents. Kept in step with the code | `docs/plan/` |
-| Kernel | Contracts, database helpers, the seven-layer factories, routes, audit, events, jobs, idempotency, rate limits, the worker | `packages/*/src/kernel/`, `packages/worker` |
-| Tables | **416 of 416**, each with row-level security, checks and indexes; 11 migrations | `packages/db/src/schema/`, `packages/db/migrations/` |
+| Kernel | Contracts, database helpers, the seven-layer factories, routes, audit, events, jobs, idempotency, rate limits, the worker, documents, the offline upload | `packages/*/src/kernel/`, `packages/worker` |
+| Tables | **416 of 416**, each with row-level security, checks and indexes; 14 migrations (the last two: staff may retry a job; a wing has a gender) | `packages/db/src/schema/`, `packages/db/migrations/` |
 | Permissions | **439 of 439**, with the roles that hold each by default | `packages/contracts/src/modules/*/*.permissions.ts` |
 | Record schemas and value lists | One for every table | `packages/contracts/src/modules/*/*.entities.ts`, `*.constants.ts` |
-| Plain API | **567 of 1,615 routes**, for 222 resources: input contract, db-service, service, Route Handlers, API client, hooks | `*.contract.ts`, `packages/core/src/modules/`, `apps/web/app/api/v1/`, `packages/api-client`, `packages/hooks` |
-| Hand-written API | `rooms`, `branches`, `me` (from Phase 0) | same folders, files without a "Generated by" header |
+| Plain API | **567 routes** for 222 resources: input contract, db-service, service, Route Handlers, API client, hooks | `*.contract.ts`, `packages/core/src/modules/`, `apps/web/app/api/v1/`, `packages/api-client`, `packages/hooks` |
+| Hand-written API | 86 routes: **all 53 of the shared kernel (M00) and all 25 of the organisation (M02)**; `me` (3, from Phase 0); `reports` (library, one report, run), `calendar`, `dev/outbox` | same folders, files without a "Generated by" header |
+| Route manifest | Every route with its permission, idempotency and rate limit, read from the code | `apps/web/src/server/manifest.ts`, written by `pnpm api:manifest` |
+| Shared services | Ledger posting; stock movement; tax calculators and rule lookup; notification dispatch and delivery; documents; the report, measure, KPI and widget registries; the calendar; the offline upload; the stand-in payment provider | see the list under "What step 2.1 built" |
+| What a new school starts with | Organisation, branches, roles and permissions, modules, the setup checklist, and now its accounting: a chart of 137 accounts, nine journals, an account for every posting, the current fiscal year | `packages/db/src/provision.ts`, `provision/accounting.ts` |
 | Demo data | Setup, staff, classes, students, admissions, certificates, front office, alumni, timetable, syllabus, attendance, diary and homework | `packages/db/src/seed/` |
 | Screens | None. Placeholder pages only | `apps/web/app/` |
 
-Two generators write most of this, and their output is never edited by hand:
+Two generators write most of the data layer and the plain API, and their output is never edited by hand:
 
 - `pnpm scaffold` writes tables, value lists, record schemas, permissions and test fixtures from the module specs and `docs/plan/_tools/scaffold-hints.mjs` (with `hints-wave3.mjs` to `hints-wave8.mjs`).
 - `pnpm scaffold:api` writes the plain API from the specs' route tables, the tables in code and `docs/plan/_tools/api-hints.mjs`.
 
+### What step 2.1 built
+
+Each is described, with what it leaves for later, in "The cross-cutting pieces, one by one" in [`phase-02-services-and-routes.md`](plan/20-phases/phase-02-services-and-routes.md).
+
+| Piece | What a module does with it | Where |
+|---|---|---|
+| Counting progress | `pnpm api:manifest`, `pnpm api:verify-plan`, `pnpm plan:coverage` | `apps/web/scripts/`, `docs/plan/_tools/coverage.mjs` |
+| The test that calls every route | Nothing: a new route is covered the moment it is in the manifest | `tests/api/security/routes.generated.test.ts` |
+| Ledger | `ledger.post`, `ledger.reverse`, `ledger.reverseEntry`, `ledger.assertOpen` | `packages/core/src/modules/accounting/ledger.ts` |
+| Stock | `stock.move` | `packages/core/src/modules/inventory/stock.ts` |
+| Tax | `taxService.ruleFor`, then `salaryTaxForMonth`, `feeAdvanceTax`, `vendorWithholding`, `eobi`, `socialSecurity`, `providentFund` | `packages/core/src/modules/tax/` |
+| Telling people | `emit(ctx, event, payload)`; `registerEventVariables` for amounts, dates and links | `packages/core/src/modules/messaging/`, `kernel/events.ts` |
+| Documents | `requestDocument` | `packages/core/src/kernel/documents.ts` |
+| Reports | `defineReport`, `defineMeasure`, `defineKpi`, `defineWidget` in `<module>.reports.ts` | `packages/core/src/modules/reports/` |
+| Calendar | `registerCalendarSource` | `packages/core/src/modules/notices/calendar.service.ts` |
+| Offline | `registerSyncTable` | `packages/core/src/kernel/sync.ts` |
+| Online payments, locally | `paymentProvider()` gives the stand-in gateway | `packages/core/src/providers/payments.ts` |
+
+### What step 2.2 has built so far
+
+The detail, with what was decided on the way, is in "Step 2.2, module by module" in [`phase-02-services-and-routes.md`](plan/20-phases/phase-02-services-and-routes.md), and each decision is written into the module's spec.
+
+| Module | What a later module does with it | Where |
+|---|---|---|
+| **M00 shared kernel**, complete | Hangs files and notes on its records (`registerRecordAccess` answers who may; every plain resource is registered already). Asks for approval (`requestApproval`, `onApprovalDecided`). Offers an import (`defineImporter`) or an export (`defineExporter`). Checks custom fields (`customFieldsService.validate`). Answers global search (`registerSearchSource`). States what must always hold (`registerIntegrityCheck`). Lets a person take a device's value in a conflict (`takeDevice` in `registerSyncTable`) | `packages/core/src/modules/shared/` |
+| **M02 organisation**, complete | Declares a setting with who may change and read it (`defineSetting({ permission, readableBy })`). Says what of its records stops a branch being deactivated (`registerBranchBlocker`), a room being deleted (`registerRoomUse`) or the way of billing changing (`registerBillingModeBlocker`). Listens for `branch.created` to give a new branch what it needs | `packages/core/src/modules/organisation/` |
+| Who a teacher may see | `teacherSectionIds`, `wingGradeIds`, `enrollmentReach`: a teacher's sections, a section head's wing, and both as a condition on enrolments | `packages/core/src/modules/academics/scope.ts` |
+| Test helpers for classes | `activeYear`, `gradeAt`, `makeSection`, `enrol`, `assignSubjectTeacher`, `makeWing` | `tests/helpers/classes.ts` |
+
 ## What was checked
 
-| Check | Result | When |
-|---|---|---|
-| `pnpm scaffold --check`, `pnpm scaffold:api --check` | Up to date | 11 Oct, after the last change |
-| Type-check of every package and of the whole repository | Clean | 11 Oct, after the last change |
-| `eslint . --max-warnings 0` | Clean | 11 Oct, after the last change |
-| Full test suite on the in-process database (`pnpm test`) | **1,378 passed, 1 skipped, in 24 files** | 11 Oct, after the last code change |
-| `pnpm db:verify-plan` | Code matches the plan: 416 tables, 439 permissions | 11 Oct |
-| Row-level security, generated for every table | Passes on both engines | 11 Oct |
-| Every generated route, called three ways (no session, without the permission, with it) | 567 routes pass | 11 Oct, in-process database |
-| `pnpm test:db` (the real Postgres in Docker) | 809 passed, 1 failed; the failure was in the test's own plumbing and is fixed. **The whole suite was not run again on Docker after that fix, nor since the API generator was added** | 11 Oct, before the API generator |
-| `pnpm db:reset` (full size), `pnpm db:verify-seed` (38 checks), `pnpm smoke` (20 checks) | Passed | 11 Oct, before the API generator |
+All on 11 October 2026, evening, after the last change to code.
 
-**So the first thing a new session owes is `pnpm test:db`, `pnpm db:reset` and `pnpm smoke`** with the stack running. Nothing changed in the schema since they last passed.
+| Check | Result |
+|---|---|
+| `pnpm scaffold --check`, `pnpm scaffold:api --check` | Up to date |
+| `pnpm db:verify-plan` | Code matches the plan: 416 tables, 439 permissions |
+| `pnpm api:verify-plan` | The routes in code match the plan: 586 of 1,615 exist; none unplanned, none with another permission |
+| `pnpm plan:coverage` | 40 of 737 rules, 25 of 416 failure cases and 36 of 553 listed tests have a test named after them; no test names an id the plan lacks |
+| Type-check of every package and of the whole repository | Clean |
+| `eslint . --max-warnings 0` | Clean |
+| Full test suite on the in-process database (`pnpm test`) | **1,642 passed, 1 skipped, in 40 files** |
+| Full test suite on Docker Postgres (`pnpm test:db`) | **1,643 of 1,643 passed**, in two goes: see the note below this table |
+| Every route, called three ways (no session, without the permission, with it) | Passes for all 586, on both databases |
+| `pnpm db:reset` (full size), `pnpm db:verify-seed` (38 checks) | Passed. Both demo schools now hold their accounting: 137 accounts, 9 journals, 39 account mappings, FY 2026–27 with 12 periods |
+| `pnpm smoke` (20 live checks with real sign-ins) | Passed |
+| The new routes inside the running app, with real sign-ins | `GET /reports` (an empty library, as no module has registered a report), `GET /calendar`, `GET /dev/outbox` and `POST /sync/upload` answered as they should for a principal, a guardian and nobody |
+
+**The Docker run.** The whole suite ran on Docker Postgres after the last change: 1,642 passed and one timed out, a row-level-security probe of `hostel_authorised_people` that sat for thirty minutes. The Windows power log shows the computer went into standby during the run and woke at 8:01 pm, exactly then. That test file was run again on its own straight afterwards and all 450 of its tests passed. Nothing in the code was at fault; a long run needs the computer kept awake.
+
+**Not yet run:** `pnpm test:e2e` (there are no screens to test). The ledger's "fifty simultaneous requests" tests of the money modules themselves come with those modules; the shared services were proved with twenty simultaneous postings of one source and eight simultaneous issues of the last stock.
 
 ## What comes next, in order
 
 The owner's order is fixed: finish the whole backend, then the frontend foundation, then sign-in for every role, then the portals one by one, then the marketing site, then the mobile apps. Within the backend, speed matters more than polish: build every module's layer before enriching any one module.
 
-### 1 · Re-run the Docker checks (half an hour)
+### 1 · Confirm the state (a quarter of an hour)
 
-`pnpm test:db`, `pnpm db:reset`, `pnpm db:verify-seed`, `pnpm smoke`. Fix whatever they find before anything else.
+`pnpm check`, with the computer kept awake. Everything passed at the end of the last session, so anything that fails now is new.
 
-### 2 · Phase 2: the rest of the API
+### 2 · Phase 2, step 2.2: M00, M02, M03, M01 by hand
 
-The work list is the "Order of work" table in [`phase-02-services-and-routes.md`](plan/20-phases/phase-02-services-and-routes.md). `pnpm scaffold:api --report --all` prints every route that waits and why. In the order to do them:
+160 routes, of which 81 exist. `pnpm api:verify-plan --module M03 --waiting` lists what waits; `pnpm plan:coverage --module M03` lists the rules without a named test.
 
-1. **Cross-cutting pieces (step 2.1).** None is built yet: the route manifest and `pnpm api:verify-plan`; `pnpm plan:coverage`; ledger posting (M23); stock movement (M32); tax calculators (M25); notification dispatch with the local `log` adapters and `/dev/outbox` (M37); approvals, imports and exports (M00); the report registry (M42); calendar entries (M39); `requestDocument` with a placeholder renderer; the sync upload endpoint; the `fake` payment adapter. Modules lean on these, so they come first.
-2. **Wave 0 by hand (step 2.2):** M00, M02, M03, M01. 160 routes; 46 of them are plain and were left out of the generator on purpose, because these modules were hand-written in Phase 0.
-3. **Then module by module** in the phase's order (2.3 to 2.13). For each module:
-   - read sections 4 to 7, 10, 11 and 13 of its spec;
-   - **take over** each resource that has rules: add its table to `handWritten` in `docs/plan/_tools/api-hints.mjs`, remove the "Generated by" header from its contract, db-service, service, route, API client and hooks files, then edit them (rules in the service through `rules.beforeCreate` and friends, input validation in the contract, friendly constraint messages with `registerConstraintMessages`). `rooms` and `branches` are the worked examples; [`docs/reference/adding-a-resource.md`](reference/adding-a-resource.md) has the steps;
-   - write the named actions (approve, publish, collect, compute and so on) as service functions with their own route files, each with `defineRoute({ permission, … })`;
-   - write the module's settings, events, state machines and jobs, which Phase 1 left for this moment;
-   - write a test for every `R-…`, `F-…` and `T-…` id in the spec, named with the id;
-   - create the module's demo data by calling its services (see "Left out on purpose").
-4. **37 "add" operations wait for a service** because the server must fill something: a number from a sequence (`receipt_no`, `voucher_no`, `employee_no`, `admission_no` …), a total, or a value copied from another record. A few of these only need a hint and no service: `bell_schedules.lesson_count`, `student_discounts.calc`, `salary_components.calc`, `notices.branch_ids`, `vendors.code` and `inventory_items.sku` were held back by cautious wording rules in the generator; check each against its spec and, where the client does send the value, list the column under `input` in `api-hints.mjs`.
+1. **M00, shared kernel: done.** 53 of 53 routes; 15 rules, 10 failure cases and 12 listed tests each have a named test.
+2. **M02, organisation: done.** 25 of 25 routes; 11 rules, 6 failure cases and 9 listed tests each have a named test.
+3. **M03, identity (30 of 33 wait): next.** Roles and their permissions, memberships, invitations, the audit log, login events, the rest of `/me`. Read the spec's sections 4 to 7 and 13 first. Things worked out while reading, so they need not be worked out again:
+   - Several routes act on a person's login, not on Takhti's own tables: accepting an invitation creates or links a login, forcing a sign-out ends sessions, resetting a password sends a link or issues a PIN, changing a phone number verifies the new one. There is no stand-in for the sign-in service yet. Write `packages/core/src/providers/auth.ts` the way the other providers are written (an interface, an in-memory stand-in for tests, the real one over Supabase Auth's admin calls), and **read Supabase Auth's current documentation before writing the real one**. The seed (`packages/db/src/seed/run.ts`) shows the one admin call already in use.
+   - Ending sessions is already half built: `memberships.token_version` is compared on every request (`actorFor`), so raising it refuses the old session at once.
+   - Add a way for a background job to learn the language a person reads in, so staff are not always written to in English (see "Left out on purpose").
+   - A school's own (custom) role is treated as a wide role by `teacherSectionIds` and `wingGradeIds`: a role copied from "class teacher" would see every student of the branch. When roles are built, decide whether a custom role remembers the built-in role it was copied from, and use that.
+   - The audit log is read with cursor paging (`listCursor` in the db-service), not page numbers.
+4. **M01, platform (49 wait).** The platform services on the privileged connection. `provisionOrg` already does the accounting part of R-platform-1; grading schemes, fee heads, notification templates and number sequences join it as their modules are written.
 
-### 3 · Phase 1: what is still open
+When a module is finished, add its line to `tests/api/security/rls.modules.test.ts` (unless its spec's security test asks for more than "every table is covered", in which case write that test).
+
+### 3 · Then module by module, steps 2.3 to 2.13
+
+The order is the "Order of work" table in [`phase-02-services-and-routes.md`](plan/20-phases/phase-02-services-and-routes.md). For each module:
+
+- read sections 4 to 7, 10, 11 and 13 of its spec;
+- **take over** each resource that has rules: add its table to `handWritten` in `docs/plan/_tools/api-hints.mjs`, remove the "Generated by" header from its contract, db-service, service, route, API client and hooks files, then edit them (rules in the service through `rules.beforeCreate` and friends, input validation in the contract, friendly constraint messages with `registerConstraintMessages`). `rooms` and `branches` are the worked examples; [`docs/reference/adding-a-resource.md`](reference/adding-a-resource.md) has the steps;
+- write the named actions (approve, publish, collect, compute and so on) as service functions with their own route files, each with `defineRoute({ permission, … })`, then `pnpm api:manifest` and `pnpm api:verify-plan`;
+- declare the module's settings, events (with their wording in English and Urdu) and state machines, and write its jobs;
+- register its reports, calendar source and offline tables with the registries of step 2.1;
+- write a test for every `R-…`, `F-…` and `T-…` id in the spec, named with the id; `pnpm plan:coverage --module M21` says which are missing;
+- create the module's demo data by calling its services (see "Left out on purpose").
+
+**Thirty-seven "add" operations wait for a service** because the server must fill something: a number from a sequence (`receipt_no`, `voucher_no`, `employee_no`, `admission_no` …), a total, or a value copied from another record. A few of these only need a hint and no service: `bell_schedules.lesson_count`, `student_discounts.calc`, `salary_components.calc`, `notices.branch_ids`, `vendors.code` and `inventory_items.sku` were held back by cautious wording rules in the generator; check each against its spec and, where the client does send the value, list the column under `input` in `api-hints.mjs`. `pnpm scaffold:api --report --all` lists all thirty-seven.
+
+### 4 · Phase 1: what is still open
 
 See the checkboxes and "Exit checks" in [`phase-01-database.md`](plan/20-phases/phase-01-database.md). In short: the settings and events catalogues (they arrive with each module's service), the map from subscription plan to modules, the optional squash of migrations, and three exit checks (the reset takes about six minutes against a target of three; a refusal test for every constraint; the ledger and stock integrity checks, which need demo data that does not exist yet).
 
-### 4 · After the backend
+### 5 · After the backend
 
-Phase 3 (API clients and hooks for the routes that are not plain), Phase 4 (the Kashi theme and components), Phase 5 (sign-in for all roles), then the portals. The progress table is in [`docs/plan/README.md`](plan/README.md).
+Phase 3 (API clients and hooks for the routes that are not plain), Phase 4 (the Kashi theme and components), Phase 5 (sign-in for all roles), then the portals. The progress paragraph is in [`docs/plan/README.md`](plan/README.md).
 
 ## Left out on purpose
 
@@ -105,25 +161,51 @@ Each of these was a decision, not an oversight. None is hidden: a new session sh
 
 | What | Why | Picked up |
 |---|---|---|
-| **Business rules in generated services** | A generated service checks the module switch and the permission, validates the shape, writes and audits. It applies no rule of section 5 of any spec. A plain `PATCH` therefore lets a permitted person change fields a rule would protect | Phase 2, module by module, by taking the resource over |
+| **Business rules in generated services** | A generated service checks the module switch and the permission, validates the shape, writes and audits. It applies no rule of section 5 of any spec. A plain `PATCH` therefore lets a permitted person change fields a rule would protect. The sharpest case: `PATCH /journal-entries/[id]` lets someone with `journal-entries:create` change the header of a posted entry (its lines are guarded by the database) | Phase 2, module by module, by taking the resource over; journal entries in step 2.7 |
 | **Demo data for M16 to M20** (quizzes, question bank, exams, marks, results, behaviour) **and for every module of Waves 4 to 8** (finance, payroll, operations, communication, insight) | Writing it by hand meant writing the fee, payroll and result calculations twice. The seed principles ask for data made by the real code | Phase 2, with each module's services (step 2.14 and the "Demo data moves to the services" note in Phase 1) |
-| Named tests for rules (`R-…`, `F-…`, `T-…`) of Waves 1 to 8 | They test services that do not exist yet | Phase 2 |
+| Named tests for most rules (`R-…`, `F-…`, `T-…`) | They test services that do not exist yet. `pnpm plan:coverage` counts what is there | Phase 2, with each module |
 | Create, update and list inputs beyond the generated ones; settings; events; state machines; friendly constraint messages | An input is only right once its service is | Phase 2 |
+| **The event catalogue holds only the ten events of M00 and M02** | An event is declared by the module that raises it, with its wording | Phase 2, with each module; the wording is reviewed in Phase 12 |
+| **The settings catalogue holds only the eight general settings** | A setting is declared by the module it belongs to, with the permission that changes it | Phase 2, with each module |
+| **Imports are checked and committed inside the request** | The kernel does both in one transaction, up to 5,000 rows. The jobs `shared.validate-import` and `shared.commit-import` are not written | When the first import is large enough to need them (students, in step 2.3, is the likely one) |
+| **No module has registered a data check, a search source of its own rules, or a calendar source** | The registries are built and tested with made-up entries; students, guardians, staff and vouchers answer global search already | With each module's service |
+| **Copying the bell schedule and the fee structures into a new branch** (R-org-11) | They belong to the timetable and fees modules. `branch.created` carries what was asked for | Steps 2.5 and 2.8: subscribe to `branch.created` |
+| **A conflict resolved as `merged`** | The route offers the server's value or the device's. `merged` stays in the list of states for a module that later applies a value a person edited | With the first module that needs it (marks, step 2.6) |
+| **A family cannot be given a link to a file that staff uploaded** | Row-level security on `files` shows a family only its own uploads. A school's logo, a circular's attachment and a report card are all such files | Decide with the first family download route (certificates in step 2.4, or the logo with the family shell) |
+| **A class teacher holds `fee-vouchers:read`** although R-students-17 says a teacher never sees fee data | The two specs disagree. Global search already limits a teacher to the vouchers of their own sections | Step 2.8, with the fees module: settle the wording in both specs |
+| **API clients and hooks for the hand-written routes of M00 and M02** (files, approvals, imports, search, settings, the profile, the checklist) | Only the plain resources have theirs (approval policies, custom fields, branches, wings, rooms). The rest is Phase 3's work | Phase 3 |
+| **Staff are written to in English** by notification dispatch; guardians in their chosen language | A background job cannot read another person's interface language: preferences belong to the person alone | Step 2.2, with M03 |
+| The cost of a message and the credit it uses; daily digests; the sending rate; provider callbacks; flagging a wrong number; campaigns | They are the rest of the messaging module. A digest event writes the bell now and sends no outside message | Step 2.12 |
+| Manual journal entries, transfers, periods and year-end, financial reports, the accounting integrity job, `accounting.lock_days` | The ledger's posting service is the shared part; these are the accounting module itself | Step 2.7 |
+| `inventory.allow_negative`; issue requests, transfers, counts and assets as routes | `stock.move` is the shared part | Step 2.9 |
+| Report export, saved reports, schedules, analysis, KPI snapshots, dashboards | The registries are the shared part. The screen limit of 5,000 rows is a constant until the module's settings are declared | Step 2.13 |
+| Real pages for printed documents | `requestDocument` writes a one-page stand-in PDF that says what the document is | Phase 16 |
+| The page that completes or fails a fake online payment | It is a screen, and needs the payment intents of the payments module | Phase 4, after step 2.8 |
 | Documents and uploaded files in the seed (B-Forms, certificates' PDFs, report cards) | They need the upload and document services | Phases 2 and 16 |
 | Diary acknowledgements for most families | Only four guardians can sign in until guardians sign in by phone | Phase 5 |
 | `knowledge_chunks.embedding` as pgvector | The in-process test database has no pgvector; the column is a plain list of numbers for now | The migration that turns vector search on (Phase 19) |
 | Monthly partitions for `vehicle_locations` and other large tables | Not needed until measured | Phase 21 |
 | The test OTP map for phone sign-in | Belongs with phone sign-in | Phase 5 |
 | Squashing the migrations | Optional, and only possible before real data exists | End of Phase 1, if wanted |
-| **A remote, and pushing** | The first commit exists on `main` (11 October 2026), made when the owner asked. No remote is set and nothing is pushed. Later work is committed only when the owner asks | When the owner says so |
+| **Committing steps 2.1 and 2.2, a remote, and pushing** | The first commit exists on `main` (11 October 2026, morning), made when the owner asked. Everything since is in the working tree. No remote is set and nothing is pushed | When the owner says so |
+
+## Things a qualified person must confirm
+
+Nothing here is a figure in the code; each is a reading of how a rule works, written in the spec and marked for confirmation.
+
+- **How each tax calculator reads its rule**: the order of a teacher's rebate and a surcharge, rounding to the rupee, the yearly cap on advance tax on fees and no charge for vouchers issued before the threshold was crossed, what "above the ceiling" means for social security (the rule itself must now say). [M25](plan/10-modules/m25-tax-compliance.md), section 4.
+- **The default chart of accounts** a new school starts with: 137 accounts in five groups, and which account each automatic posting uses. An accountant should read it before a real school does. `packages/db/src/provision/accounting.ts`.
 
 ## Known problems and things to watch
 
 - **This computer runs out of virtual memory after days without a restart.** On 11 October tools crashed with "paging file is too small", `ERR_WORKER_OUT_OF_MEMORY` and a Go allocation trace from the type-checker. The code was not at fault; a restart of Windows cleared it. If tools crash on start, check memory before suspecting the code.
-- **After a restart Docker Desktop is not running**, so nothing that needs the database works until it is started.
+- **After a restart Docker Desktop is not running**, and when it is started the stack's containers are stopped: `pnpm db:stop`, then `pnpm db:start`.
+- **The computer goes into standby during long runs.** On 11 October it slept for half an hour in the middle of `pnpm test:db`; one test timed out and the run took forty minutes instead of ten. In the night of 11 to 12 October it slept for five and a half hours in the middle of a type-check, which then finished clean. Keep it awake, or run the suite again when a single test times out with nothing else wrong.
+- **Straight after waking, everything is many times slower for a while.** Three test files took eighteen minutes once (the same three took eighty seconds a little later); the processor was at 97%. Nothing hung. Give a slow command time before suspecting a deadlock.
+- **A shell script that writes a file can damage it.** A regular expression lost its backslash that way on 11 October, and scripts holding Urdu text were refused whole. Files are written with the file tools; see [`lessons-learned.md`](reference/lessons-learned.md).
 - **The seed's attendance step is slow** (about a minute of the ninety-second full seed). `--small` avoids it during ordinary work.
 - **A stall of two minutes was seen twice in the seed straight after a database reset** and never reproduced. If it comes back, look at `pg_stat_activity` while it hangs.
-- **Other Supabase projects run on this machine** (`darsgah`, `edu-erp`). Never stop them, and never run `wsl --shutdown` or stop Docker to free memory.
+- **Other Supabase projects run on this machine** (`darsgah`, `edu-erp`). Never stop them, and never run `wsl --shutdown` or stop Docker to free memory. After the restart of 11 October their containers were left stopped, as they were found.
 
 ## How long things take
 
@@ -131,14 +213,16 @@ Measured on this machine on 11 October. Everything is slower, sometimes several 
 
 | Command | About |
 |---|---|
-| Type-check of the whole repository | 1 minute |
+| Type-check of the whole repository | 2 minutes |
 | `eslint .` | 1 minute |
-| `pnpm test` in full (1,379 tests) | 6 minutes on a freshly restarted machine |
-| The row-level security tests alone, or the generated route test alone | 5 to 6 minutes each |
-| `pnpm test:db` in full | 9 minutes when it had 810 tests; expect about 15 now |
-| `pnpm db:reset` (full size) | 4 to 6 minutes; `--small` is much quicker |
+| `pnpm test` in full (1,643 tests) | 10 minutes |
+| The test that calls every route, alone | 1 minute |
+| One test file | 1 minute, most of it start-up |
+| `pnpm test:db` in full | 7 minutes when it had 1,379 tests; expect 10 now |
+| `pnpm api:manifest` | 1 minute |
+| `pnpm db:reset` (full size) | 3 to 6 minutes; `--small` is much quicker |
 
-Run the slow ones in the background and keep working. One test file at a time is `./node_modules/.bin/vitest run <path>`; on Docker, `pnpm test:db <path>`.
+Run the slow ones in the background and keep working, but do not change code while a test run is reading it. One test file at a time is `./node_modules/.bin/vitest run <path>`; on Docker, `pnpm test:db <path>`.
 
 ## How the owner wants the work done
 
@@ -156,4 +240,4 @@ These were said by the owner during the build. They are not in any spec, so they
 
 ## Keeping this file true
 
-Before ending a session: update "What exists", "What was checked" and "What comes next"; tick the checkboxes in the phase file; update the progress table in [`docs/plan/README.md`](plan/README.md). When something is put off, add a row to "Left out on purpose" with where it is picked up. Lessons that cost time go into [`docs/reference/lessons-learned.md`](reference/lessons-learned.md).
+Before ending a session: update "What exists", "What was checked" and "What comes next"; tick the checkboxes in the phase file; update the progress paragraph in [`docs/plan/README.md`](plan/README.md). When something is put off, add a row to "Left out on purpose" with where it is picked up. Lessons that cost time go into [`docs/reference/lessons-learned.md`](reference/lessons-learned.md).

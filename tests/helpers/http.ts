@@ -58,6 +58,25 @@ export interface CallResult<T = unknown> {
   headers: Headers;
 }
 
+/**
+ * Calls a Route Handler and hands back the response as it is, for a route that answers with a file
+ * (a CSV template, a download) rather than with JSON.
+ */
+export async function callRouteRaw(handler: RouteHandler, options: CallOptions): Promise<Response> {
+  useTestSessions();
+  const headers: Record<string, string> = { ...options.headers };
+  if (options.as) {
+    headers[TEST_USER_HEADER] = options.as.userId;
+    if (options.as.membershipId) headers['x-membership-id'] = options.as.membershipId;
+  }
+  if (!options.crossSite) headers.origin ??= APP_ORIGIN;
+  const request = new Request(new URL(options.url, APP_ORIGIN), {
+    method: options.method ?? 'GET',
+    headers,
+  });
+  return handler(request, { params: Promise.resolve(options.params ?? {}) });
+}
+
 export async function callRoute<T = unknown>(
   handler: RouteHandler,
   options: CallOptions,

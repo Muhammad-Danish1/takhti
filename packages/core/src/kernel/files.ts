@@ -2,6 +2,7 @@ import { and, eq, isNull, sql } from 'drizzle-orm';
 import {
   fileExtensions,
   filePurposeRules,
+  type ConfirmedUpload,
   type FilePurpose,
   type FilePurposeRule,
   type UploadTicket,
@@ -104,12 +105,12 @@ async function ownPending(ctx: Ctx, fileId: string) {
 
 /**
  * Step 3: checks that what reached Storage is what was promised, then marks the file ready.
- * A file that is larger than promised, or of another type, is removed and refused.
+ * A file that is empty, too large or of another type is removed from Storage and quarantined.
+ *
+ * A quarantine is a fact that must be kept, so it is an answer and not an error: an error would
+ * undo the very mark that records it. The caller reads `status`.
  */
-export async function confirmUpload(
-  ctx: Ctx,
-  fileId: string,
-): Promise<{ id: string; status: 'ready' }> {
+export async function confirmUpload(ctx: Ctx, fileId: string): Promise<ConfirmedUpload> {
   const file = await ownPending(ctx, fileId);
   if (file.status === 'ready') return { id: file.id, status: 'ready' };
   if (file.status !== 'pending') throw rule('This file can no longer be used');
@@ -134,15 +135,16 @@ export async function confirmUpload(
         version: sql`${files.version} + 1`,
       })
       .where(eq(files.id, file.id));
-    throw invalid({
-      file: [
+    return {
+      id: file.id,
+      status: 'quarantined',
+      reason:
         stored.size === 0
           ? 'The file is empty'
           : wrongType
-            ? 'The file is not of the kind that was announced'
+            ? 'This file type is not allowed'
             : 'The file is larger than allowed',
-      ],
-    });
+    };
   }
 
   await ctx.db
@@ -182,7 +184,14 @@ export async function signedDownload(
 /** Stores a file the server made itself (an export, a generated PDF) and records it as ready. */
 export async function storeGeneratedFile(
   ctx: Ctx,
-  input: { purpose: FilePurpose; fileName: string; mimeType: string; content: Uint8Array },
+  input: {
+    purpose: FilePurpose;
+    fileName: string;
+    mimeType: string;
+    content: Uint8Array;
+    /** The person the file is for, when a background job makes it: a job is nobody, and a file needs an owner. */
+    ownerUserId?: string;
+  },
 ): Promise<string> {
   const purposeRule = checkFileLimits({
     purpose: input.purpose,
@@ -203,8 +212,8 @@ export async function storeGeneratedFile(
     mimeType: input.mimeType,
     sizeBytes: input.content.byteLength,
     status: 'ready',
-    // A file needs a real owner. For a system job that is the user who asked for it, passed in by the caller's ctx.
-    uploadedBy: ctx.actor.userId,
+    // A file needs a real owner: whoever is acting, or the person a job is working for.
+    uploadedBy: input.ownerUserId ?? ctx.actor.userId,
     createdAt: ctx.now,
     updatedAt: ctx.now,
     createdBy: stampOf(ctx),

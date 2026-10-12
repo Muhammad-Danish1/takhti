@@ -27,6 +27,20 @@ export function randomDigits(length: number): string {
   return code;
 }
 
+/** A short code from the given letters and digits, each equally likely: a device code, a pickup code. */
+export function randomCode(length: number, alphabet: string): string {
+  if (length < 1 || length > 32) throw new Error('A code has 1 to 32 characters');
+  if (alphabet.length < 2 || alphabet.length > 256) throw new Error('An alphabet has 2 to 256 characters');
+  // The largest multiple of the alphabet's size that fits in a byte; anything above it is thrown away.
+  const limit = 256 - (256 % alphabet.length);
+  let code = '';
+  while (code.length < length) {
+    const byte = randomBytes(1)[0] ?? 0;
+    if (byte < limit) code += alphabet.charAt(byte % alphabet.length);
+  }
+  return code;
+}
+
 /** SHA-256 of a token, hex. What is stored instead of the token. */
 export const hashToken = (token: string): string =>
   createHash('sha256').update(token, 'utf8').digest('hex');

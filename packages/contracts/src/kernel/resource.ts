@@ -112,6 +112,11 @@ export interface ResourceContract<
   update: TUpdate;
   /** GET query string. */
   list: TList;
+  /**
+   * Adding one must not happen twice (a booking, a batch of cards): `POST` then requires an
+   * `Idempotency-Key` header, and the API client sends one.
+   */
+  idempotentCreate?: boolean;
 }
 
 export function defineResource<

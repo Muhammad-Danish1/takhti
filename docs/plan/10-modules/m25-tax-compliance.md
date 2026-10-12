@@ -105,7 +105,7 @@ A deposit or statement that is due.
 | working_document_id | uuid → generated_documents | optional; the schedule Takhti produced |
 | prepared_by | uuid → profiles | optional |
 
-Unique: (kind, branch_id, period_from).
+Unique: (org_id, kind, branch_id, period_from).
 
 #### `withholding_certificates` · org +self
 
@@ -155,18 +155,31 @@ Anything with a legal deadline that is not a tax deposit: registration and affil
 | `fee_advance_tax` | `{ enabled: boolean, annualThreshold: number, percent: number, appliesTo: 'all' \| 'non_filers', countHeads: 'flagged' }` |
 | `vendor_withholding` | `{ rows: { vendorKind: 'company' \| 'individual', supply: 'goods' \| 'services', filer: boolean, percent: number, minimumPayment?: number }[] }` |
 | `eobi` | `{ wageBase: number, employeePercent: number, employerPercent: number }` |
-| `social_security` | `{ wageCeiling: number, employerPercent: number }` |
+| `social_security` | `{ wageCeiling: number, employerPercent: number, aboveCeiling: 'not_covered' \| 'capped' }` |
 | `provident_fund` | `{ employeePercent: number, employerPercent: number, onComponents: string[] }` |
 | `minimum_wage` | `{ monthly: number }` |
 
 **Calculators** — pure functions in `packages/core/src/modules/tax/calc/`, each taking the rule and returning the amount with a breakdown:
 
-- `salaryTaxForMonth({ rule, taxableToDate, taxPaidToDate, taxableThisMonth, monthsLeft })` — projects the year's income, applies the slabs, and spreads what is still owed over the remaining months, so a mid-year raise or joining corrects itself.
+- `salaryTaxForMonth({ rule, taxableToDate, taxPaidToDate, taxableThisMonth, monthsLeft, teacher? })` — projects the year's income, applies the slabs, and spreads what is still owed over the remaining months, so a mid-year raise or joining corrects itself.
 - `feeAdvanceTax({ rule, annualFees, filer, alreadyCollected, thisVoucherBase })`.
 - `vendorWithholding({ rule, vendorKind, supply, filer, gross, exempt })`.
 - `eobi({ rule })`, `socialSecurity({ rule, wage })`, `providentFund({ rule, components })`.
 
-`TaxService.ruleFor(kind, date, province?)` returns the confirmed rule in force, or fails with `RULE` and a message naming the kind and date.
+Figures in a rule are whole rupees and percentages; the calculators take and return paisa. They hold no figure of their own: every rate, slab, threshold and ceiling comes from the rule they are given.
+
+**How each calculator reads its rule** **(confirm with the school's tax adviser before a rule is confirmed; the "try" route exists for exactly this)**
+
+| Calculator | Reading |
+|---|---|
+| Salary tax | Projected income for the year is `taxableToDate + taxableThisMonth × (monthsLeft + 1)`. The slab whose range holds it gives `fixed + percentOverLower %` of the income above `lower`. When `teacher` is true and the rule has `teacherRebatePercent`, that percentage of the slab tax is taken off. When the projected income is above `surcharge.above`, `surcharge.percent` of the tax after the rebate is added. The year's tax is rounded to the rupee. This month's share is what is still owed (`year's tax − taxPaidToDate`) divided by `monthsLeft + 1`, rounded to the rupee, never below zero; in the last month (`monthsLeft` 0) it is everything still owed, so the months add up to the year's tax exactly. For someone leaving, payroll passes `monthsLeft` 0 in their last month |
+| Advance tax on fees | Nothing when the rule is not `enabled`, when it applies to `non_filers` and the guardian is a filer, or while `annualFees` is not above `annualThreshold`. Otherwise `percent` of `thisVoucherBase`, rounded to the rupee, and never more than `percent` of `annualFees` less `alreadyCollected`. A status of `unknown` is read as non-filer. Vouchers issued before the family's annual figure crossed the threshold are not charged afterwards |
+| Vendor withholding | The row matching the vendor's kind, the kind of supply and the filer status gives `percent` of `gross`, rounded to the rupee. Nothing when `exempt`, or when the row has a `minimumPayment` and `gross` is below it. A table with no matching row refuses the calculation; it never assumes zero |
+| EOBI | `employeePercent` and `employerPercent` of `wageBase`, each rounded to the rupee |
+| Social security | `employerPercent` of the wage, rounded to the rupee. For a wage above `wageCeiling` the rule says which: `not_covered` gives nothing, `capped` gives the percentage of the ceiling |
+| Provident fund | `employeePercent` and `employerPercent` of the sum of the pay components named in `onComponents`, each rounded to the rupee |
+
+`taxService.ruleFor(ctx, kind, date, province?)` returns the confirmed rule in force, or fails with `RULE` and a message naming the kind and date. With a province it prefers that province's rule and falls back to one with no province; it never uses another province's.
 
 Settings: `tax.fee_advance_tax_enabled` (default false), `tax.remind_days_before_due` (default `[7, 3, 1]`), `tax.filer_recheck_days` (default 180).
 

@@ -4,5 +4,6 @@ export * from './kernel/columns';
 export * from './kernel/define-table';
 export * from './kernel/policies';
 export * from './provision';
+export * from './provision/accounting';
 export * from './registry';
 export * from './schema';

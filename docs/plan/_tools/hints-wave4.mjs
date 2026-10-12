@@ -167,7 +167,7 @@ end $$`,
     fixture: '() => ({ debit: 100, credit: 0 })',
   },
   // A mapping without a branch is the group's default for that key.
-  account_mappings: { lines: [{ match: '(key, branch_id)', nulls: 'same' }] },
+  account_mappings: { lines: [{ match: '(org_id, key, branch_id)', nulls: 'same' }] },
 
   // ------------------------------------------------------------------ M24 · Expenses and purchasing
 
@@ -224,5 +224,5 @@ end $$`,
     lines: [{ match: '(source_type, source_id, kind)', where: '${t.taxAmount} > 0' }],
   },
   // A filing without a branch covers the whole organisation.
-  statutory_filings: { lines: [{ match: '(kind, branch_id, period_from)', nulls: 'same' }] },
+  statutory_filings: { lines: [{ match: '(org_id, kind, branch_id, period_from)', nulls: 'same' }] },
 };

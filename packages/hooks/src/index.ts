@@ -5,3 +5,6 @@ export * from './modules/generated';
 export * from './modules/identity/me.hooks';
 export * from './modules/organisation/branches.hooks';
 export * from './modules/organisation/rooms.hooks';
+export * from './modules/organisation/wings.hooks';
+export * from './modules/shared/approval-policies.hooks';
+export * from './modules/shared/custom-fields.hooks';

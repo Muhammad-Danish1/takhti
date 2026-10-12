@@ -202,7 +202,7 @@ Two consequences to keep in mind. A `+cap` table is written only by people who h
 
 ### Scoping that row-level security does not do
 
-Finer rules are enforced in services with helpers from `kernel/scope.ts`, and each has a test.
+Finer rules are enforced in services with helpers from `kernel/scope.ts` (and, for the two that read the academic tables, `modules/academics/scope.ts`), and each has a test.
 
 | Rule | Helper |
 |---|---|

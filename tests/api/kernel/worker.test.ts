@@ -1,8 +1,26 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { cleanupJob, defineJob, enqueue, runAsSystem, type Actor } from '@takhti/core';
-import { adminDb, idempotencyKeys, jobSchedules, jobs, rateLimits, withAdminTx } from '@takhti/db';
+import {
+  cleanupJob,
+  confirmUpload,
+  createUpload,
+  defineJob,
+  enqueue,
+  memoryStorage,
+  runAsSystem,
+  setStorageProvider,
+  type Actor,
+} from '@takhti/core';
+import {
+  adminDb,
+  files,
+  idempotencyKeys,
+  jobSchedules,
+  jobs,
+  rateLimits,
+  withAdminTx,
+} from '@takhti/db';
 import { createWorker } from '@takhti/worker';
 import { createTestDb, type TestDb } from '../../helpers/test-db';
 import { as, freezeTime, seedOrg, type TestOrg } from '../../helpers/world';
@@ -165,7 +183,13 @@ describe('nightly cleanup', () => {
         },
       ]);
       // A platform job has no organisation; it is queued by the scheduler on the privileged connection.
-      await tx.insert(jobs).values({ orgId: null, name: cleanupJob.name, payload: {} });
+      // Its time is stated: left to the database it would be the real clock's, not the test's.
+      await tx.insert(jobs).values({
+        orgId: null,
+        name: cleanupJob.name,
+        payload: {},
+        runAt: '2026-10-12T22:00:00.000Z',
+      });
     });
 
     const worker = createWorker({ concurrency: 1 });
@@ -186,5 +210,55 @@ describe('nightly cleanup', () => {
       .sort();
     // A failed job is kept until someone has looked at it.
     expect(left).toEqual(['old failure', 'recent success', 'shared.cleanup']);
+  });
+
+  it('F-shared-1 an upload that was never finished is removed after 24 hours, with whatever part of it arrived', async () => {
+    const store = memoryStorage();
+    setStorageProvider(store);
+    const ask = (fileName: string) =>
+      as(principal, (ctx) =>
+        createUpload(ctx, { purpose: 'document', fileName, mimeType: 'application/pdf', size: 4 }),
+      );
+    const put = async (fileId: string) => {
+      const [file] = await adminDb().select().from(files).where(eq(files.id, fileId));
+      await store.put(file!.bucket, file!.path, new Uint8Array([37, 80, 68, 70]), 'application/pdf');
+    };
+    try {
+      freezeTime('2026-10-10T06:00:00.000Z');
+      const abandoned = await ask('never-finished.pdf');
+      await put(abandoned.fileId); // the bytes arrived, the confirmation never did
+      const lost = await ask('never-sent.pdf'); // not even the bytes
+      const kept = await ask('handed-in.pdf');
+      await put(kept.fileId);
+      await as(principal, (ctx) => confirmUpload(ctx, kept.fileId));
+      freezeTime('2026-10-11T07:00:00.000Z');
+      const fresh = await ask('still-uploading.pdf');
+
+      freezeTime('2026-10-11T22:00:00.000Z'); // 03:00 on the 12th in Pakistan
+      await withAdminTx((tx) =>
+        tx.insert(jobs).values({
+          orgId: null,
+          name: cleanupJob.name,
+          payload: {},
+          runAt: '2026-10-11T22:00:00.000Z',
+        }),
+      );
+      const worker = createWorker({ concurrency: 1 });
+      expect(await worker.tick()).toBe(1);
+      await worker.idle();
+
+      const state = async (fileId: string) => {
+        const [file] = await adminDb().select().from(files).where(eq(files.id, fileId));
+        return [file?.status, file?.deletedAt === null ? 'kept' : 'removed'];
+      };
+      expect(await state(abandoned.fileId)).toEqual(['deleted', 'removed']);
+      expect(await state(lost.fileId)).toEqual(['deleted', 'removed']);
+      // A confirmed file is the school's document however old it is; an upload of today may still finish.
+      expect(await state(kept.fileId)).toEqual(['ready', 'kept']);
+      expect(await state(fresh.fileId)).toEqual(['pending', 'kept']);
+      expect(store.objects.size).toBe(1);
+    } finally {
+      setStorageProvider(undefined);
+    }
   });
 });

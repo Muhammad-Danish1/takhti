@@ -100,7 +100,7 @@ The background job queue.
 | progress | jsonb | optional; `{ done, total }` |
 
 `org_id` is empty for platform jobs, which are reachable only through the privileged connection.
-Policy: any member may insert a job for their organisation; staff with `jobs:read` read.
+Policy: any member may insert a job for their organisation; staff read, and may change a job's state, which the service allows only to those who hold `jobs:retry`, to retry a failed job or cancel one that is still waiting. The worker claims and finishes jobs through the privileged connection.
 Unique: (dedupe_key) where status is queued or running.
 Index: (status, run_at, priority); (org_id, name, created_at).
 
@@ -357,10 +357,38 @@ Unique: (org_id, device_id, op_id).
 
 Notable schemas:
 
-- `CreateUpload`: `{ purpose, fileName, mimeType, size }` — size and type are checked against the purpose's limits before a link is issued.
+- `CreateUpload`: `{ purpose, fileName, mimeType, size }` — size and type are checked against the purpose's limits before a link is issued. A guardian or student may upload a photo, a document, a learning file (a homework submission) or proof of payment; staff may upload anything except `export` and `generated`, which only the server makes. Whether a file may then be used somewhere is the decision of the module it is handed to.
 - `SyncUpload`: `{ deviceId, ops: SyncOp[] }` with at most 500 operations; `SyncOp = { opId, table, op: PUT | PATCH | DELETE, id, data?, baseVersion? }`.
 - `Decision`: `{ note? }`; `note` is required for a rejection.
 - `GlobalSearch`: `{ q (min 2 characters), kinds?: (students | guardians | staff | vouchers)[] }`.
+
+**Who may see and change "any record".** Attachments and notes hang on a record of any kind, named by `entity_type` (a resource name such as `students`) and `entity_id`. Each kind answers for itself through `registerRecordAccess(entityType, { canRead, canUpdate })` in `packages/core/src/kernel/record-access.ts`. Every plain resource is registered by its service: it may be read by whoever holds its read permission and can reach the row, and changed by whoever holds its update permission. A module with finer rules registers its own answer. A kind nobody registered can have nothing attached to it and nothing read from it.
+
+**Who may download a file through `GET /files/[id]/url`.** The person who uploaded it; or anyone who can read a record it is attached to. Anyone else is told it does not exist. A file a module keeps in a column of its own (a student's photograph, a proof of payment) is given out by that module's own routes, after that module's own check.
+
+**Confirming an upload** answers with the file's state: `ready`, or `quarantined` with the reason ("This file type is not allowed"). A quarantine is a fact that must be kept, so it is an answer with status 200 and not an error: an error would undo the mark that records it.
+
+**Deleting a file.** Only its uploader, and only while it is attached to nothing. A member of a family may withdraw an upload only while it is still `pending`: once confirmed it has been handed in.
+
+**The approvals inbox.** `GET /approvals?scope=` takes `waiting` (requests whose current step I may decide; the default), `mine` (requests I raised) or `all` (every request, which needs `approvals:read`).
+
+**Imports** are checked when the file is uploaded and committed inside the request that asks for it, for now. The `shared.validate-import` and `shared.commit-import` jobs take this over when the first import is large enough to need them; the routes and their answers do not change. The file of rows that failed is kept as an export file and the person who started the import is told with `import.completed`.
+
+**Custom fields.** What a field is for (`entity`), its `key` and its `field_type` are fixed once it exists, because values are already stored under them; a change may carry the label, the choices, whether it is required, its order and whether it is active. A field is never deleted: `DELETE /custom-fields/[id]` switches it off, records keep the values they hold under it, and it is no longer asked for, shown or checked. Only a `select` field has `options`, and it must have at least one. The service of a record that has custom fields calls `customFieldsService.validate(ctx, entity, values)`, which returns the values to store or refuses with each problem under `custom.<key>`.
+
+**Notes.** A note is read and written only by staff who can open the record it is on. One marked `leaders` is read by the leaders of the school (LEADERS and the owner) and by its author, and to anyone else it does not exist. Only its author changes or deletes a note. Pinned notes come first, then the newest.
+
+**Saved views.** A person's own, for staff and families alike; nobody else can read or change one. A person has at most one default view for each list (making another the default takes the mark off the first) and keeps at most 30 views of one list.
+
+**Devices.** `POST /sync/devices` takes `{ id?, name, platform, appVersion, pendingCount? }`. A new device is given its `device_code` by the server: two characters from `23456789ABCDEFGHJKLMNPQRSTUVWXYZ`, which no other live device of the school has. Sending the same `id` again is how a device checks in: its name, version and the number of changes it still holds are updated, its code never changes, and the answer says whether it was revoked. A revoked device is not changed by a check-in. A revoked row keeps its code, so a code is never given twice.
+
+**Refused changes.** `GET /sync/rejections` lists one's own, those not yet dealt with unless `dismissed=true`; nobody else sees them, an administrator included. Dismissing one sets `resolved_at`.
+
+**Conflicts.** `POST /sync/conflicts/[id]/resolve` takes `{ resolution: keep_server | take_device }`. Keeping the server's value changes only the conflict (`kept_server`). Taking the device's value hands it to the module the record belongs to, through the `takeDevice` handler the module registered for the table with `registerSyncTable`; the module applies it by its own rules as the person deciding, and if it refuses the conflict stays open. A table whose module registered no such handler can only keep the server's value. A conflict is decided once. The status `merged` is kept for a module that later applies a value a person edited.
+
+**Data checks.** A module registers each check beside its service with `registerIntegrityCheck({ name, module, run })` in `packages/core/src/modules/shared/integrity.service.ts`; `run` returns every place where what must hold does not, and never changes anything. The job `shared.integrity` runs the checks of the modules a school has, at 02:00 for each school. A difference that already has a finding which is not resolved (the same check and the same record) is not written again; a new finding emits `integrity.finding`. A finding goes `open` → `acknowledged` → `resolved`, or straight from `open` to `resolved`; resolving needs a note; a resolved finding is never reopened, and if the difference is still there the next run reports it afresh.
+
+**Global search.** Each kind of record answers for itself: its module registers a source with `registerSearchSource({ kind, module, permission, search })` in `packages/core/src/modules/shared/search.service.ts`. A kind is searched for a person only if they hold its permission (`students:read` for students and guardians, `staff:read`, `fee-vouchers:read`) and the module is on; a kind they may not search is left out of the answer, so a family is shown nothing. `kinds` is a comma-separated list. A hit is `{ kind, id, title, titleUr, subtitle, status, branchId }`. Names are matched in English and Urdu, students also by admission number and father's name, staff by employee number, vouchers by voucher or challan number; a phone number is matched by its digits however it was typed; a B-Form or CNIC number finds a person only for someone holding `students:read-sensitive`. What row-level security does not do is added by the source: a teacher finds only the students of their sections, those students' guardians and those students' vouchers, and a section head those of their wing (`teacherSectionIds`, `wingGradeIds` and `enrollmentReach` in `packages/core/src/modules/academics/scope.ts`).
 
 ## 5 · Rules
 
@@ -371,7 +399,7 @@ Notable schemas:
 - **R-shared-5** The requester can never decide their own request.
 - **R-shared-6** A step can be decided only by a user holding one of the step's roles, with access to the request's branch.
 - **R-shared-7** Rejecting ends the request. Approving the last step ends it as approved and emits `approval.approved`; the owning module reacts in the same transaction.
-- **R-shared-8** An import commits only rows marked valid, in batches of 200, each row in its own savepoint.
+- **R-shared-8** An import commits only rows marked valid, each row in its own savepoint: a row the service refuses is marked failed with its reason and the rest go through. (When committing moves to a job, it works in batches of 200.)
 - **R-shared-9** An import batch that is `committing` or `completed` cannot be committed again.
 - **R-shared-10** Custom field values are validated against active definitions; a required custom field blocks saving the record.
 - **R-shared-11** A sync operation whose `opId` is in `sync_ops` is acknowledged as a duplicate and not applied again.
@@ -460,7 +488,9 @@ Deciding an approval needs no permission of its own: the step's roles decide who
 | GET | `/sync/conflicts` | `sync-conflicts:update` | Open conflicts |
 | POST | `/sync/conflicts/[id]/resolve` | `sync-conflicts:update` | Keeps the server value or takes the device value |
 
-`POST /sync/upload` and the two approval decisions are idempotent routes.
+Idempotent: `POST /approvals/[id]/approve`, `POST /approvals/[id]/reject`.
+
+`POST /sync/upload` needs no key of its own: every operation in it carries its `opId`, and one that was dealt with before is answered as a duplicate.
 
 ## 8 · Client layer
 
@@ -507,10 +537,10 @@ None.
 - **F-shared-1** The byte upload fails after the link was issued → the file stays `pending` and is removed after 24 hours; the form shows "Retry upload" and the record can still be saved without it.
 - **F-shared-2** A file's real type differs from the declared one → quarantined; the user sees "This file type is not allowed".
 - **F-shared-3** An approver's role is removed while a request waits → the request stays pending and becomes visible to the remaining holders of that role; if nobody holds it, leaders are alerted.
-- **F-shared-4** The record under approval is deleted → the request is cancelled automatically.
+- **F-shared-4** The record under approval is deleted → the request is cancelled automatically, whoever deleted the record: the generic delete does it, and a service with its own delete calls `cancelApproval(ctx, entityType, id, { recordDeleted: true })`.
 - **F-shared-5** An import file has the wrong columns → rejected at upload with the list of expected and found columns.
 - **F-shared-6** An import is committed twice by a double click → the second call returns the first result.
-- **F-shared-7** The worker stops mid-import → the reaper requeues the job; rows already created are skipped by their natural key.
+- **F-shared-7** An import is cut short while committing (the server stops, an error nobody planned for) → nothing of that commit is kept and the batch is still ready; committing again creates each row once. Once committing runs as a job in batches, the reaper requeues it and rows already created are skipped, because only rows still marked valid are taken.
 - **F-shared-8** A sync batch contains one bad operation → it is rejected alone; the others apply.
 - **F-shared-9** An export is requested for 200,000 rows → it runs as a job, streams to the file, and the link expires after 7 days.
 - **F-shared-10** A sequence is used by 50 requests at once → 50 distinct consecutive numbers.
